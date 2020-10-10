@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es2015",
+    "lib": ["dom", "es6", "DOM.Iterable", "ScriptHost"],
+    "sourceMap": true,
+    "rootDir": "./server",
+    "outDir": "./server-build",
+    "moduleResolution": "node",
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true
+  },
+  "types": [],
+
+  "exclude": ["node_modules/*", "__sapper__/*", "public/*", "src/*"]
+}

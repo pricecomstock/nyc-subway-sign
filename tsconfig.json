@@ -1,0 +1,14 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  // "strict": true,
+  // "sourceMap": true,
+  "types": [],
+
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules/*",
+    "__sapper__/*",
+    "public/*",
+    "server/*",
+    "server-build/*"]
+}
