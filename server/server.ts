@@ -5,6 +5,14 @@ import { Subway } from "./subway";
 let subway = new Subway();
 subway.instantiate().then(() => {
   console.log(subway.getStationById("M11"));
+  const arrivalTimes = subway.getArrivalTimesByStationId("M11");
+  arrivalTimes.forEach((at) => {
+    console.log(
+      `${at.train} arriving at ${at.stationDirection} at ${new Date(
+        at.timestamp * 1000
+      )}`
+    );
+  });
 });
 
 const { json } = bodyParser;
