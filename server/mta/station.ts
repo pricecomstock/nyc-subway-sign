@@ -1,7 +1,7 @@
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import parse from "csv-parse/lib/sync";
+import parse from "csv-parse/lib/sync.js";
 
 const MTA_STATION_CSV_URL =
   "http://web.mta.info/developers/data/nyct/subway/Stations.csv";

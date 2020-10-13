@@ -1,5 +1,5 @@
-import { fetchStations, Station } from "./station";
-import { getArrivalTimes, ArrivalTime } from "./realTimeArrival";
+import { fetchStations, Station } from "./station.js";
+import { getArrivalTimes, ArrivalTime } from "./realTimeArrival.js";
 
 export class Subway {
   private stationsByGTFSId: Map<string, Station>;
@@ -73,7 +73,7 @@ export class Subway {
   getArrivalTimesByStationId(id: string) {
     const hasDirection = ["N", "S"].includes(id.slice(-1));
     if (hasDirection) {
-      return this.arrivalTimesMap.get(id);
+      return this.arrivalTimesMap.get(id) ?? [];
     } else {
       return [
         ...(this.arrivalTimesMap.get(id + "N") ?? []),

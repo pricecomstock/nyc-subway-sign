@@ -1,6 +1,8 @@
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import axios, { AxiosRequestConfig } from "axios";
 
+const MTA_API_KEY: string | undefined = process.env.MTA_API_KEY;
+
 export class ArrivalTime {
   public readonly stationId: string;
   public readonly direction: string;
@@ -54,7 +56,7 @@ const API_URLS = {
     "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm",
 };
 
-const headers = { "x-api-key": "B4K82Vsc318tLZie3Yol07ndm7wM2ozi51aOwDux" };
+const headers = { "x-api-key": MTA_API_KEY };
 const responseType = "arraybuffer";
 
 const axiosOptions: AxiosRequestConfig = {
