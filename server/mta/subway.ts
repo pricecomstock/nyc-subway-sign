@@ -3,6 +3,7 @@ import { getArrivalTimes, ArrivalTime } from "./realTimeArrival.js";
 
 export class Subway {
   private stationsByGTFSId: Map<string, Station>;
+  private stationsListByTrain: Map<string, Station[]>;
   private stations: Station[];
   private arrivalTimes: ArrivalTime[];
   private arrivalTimesMap: Map<string, ArrivalTime[]>;
@@ -12,6 +13,7 @@ export class Subway {
   constructor() {
     this.stations = [];
     this.stationsByGTFSId = new Map<string, Station>();
+    this.stationsListByTrain = new Map<string, Station[]>();
 
     this.arrivalTimes = [];
     this.arrivalTimesMap = new Map<string, ArrivalTime[]>();
@@ -24,6 +26,15 @@ export class Subway {
         return [station.gtfsStopId, station];
       })
     );
+
+    this.stationsListByTrain = this.stations.reduce((accMap, station) => {
+      station.trains.forEach((train) => {
+        const stationsForTrain = accMap.get(train) ?? [];
+        stationsForTrain.push(station);
+        accMap.set(train, stationsForTrain);
+      });
+      return accMap;
+    }, new Map());
   }
 
   async instantiate(): Promise<void> {
@@ -33,7 +44,15 @@ export class Subway {
   }
 
   getStationById(id: string): Station | undefined {
-    return this.stationsByGTFSId.get(id);
+    return this.stationsByGTFSId.get(id.toUpperCase());
+  }
+
+  getStationListByTrain(train: string): Station[] {
+    return this.stationsListByTrain.get(train.toUpperCase()) ?? [];
+  }
+
+  getAllStations(): Station[] {
+    return this.stations;
   }
 
   async syncRealTimeArrivals() {
