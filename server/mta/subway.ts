@@ -7,6 +7,8 @@ export class Subway {
   private arrivalTimes: ArrivalTime[];
   private arrivalTimesMap: Map<string, ArrivalTime[]>;
 
+  private realTimeUpdateIntervalId: NodeJS.Timeout = setTimeout(() => {}, 0);
+
   constructor() {
     this.stations = [];
     this.stationsByGTFSId = new Map<string, Station>();
@@ -26,6 +28,7 @@ export class Subway {
 
   async instantiate(): Promise<void> {
     await Promise.all([this.downloadStations(), this.syncRealTimeArrivals()]);
+    this.startRealTimeUpdates(60000); // update once per minute
     return;
   }
 
@@ -70,7 +73,7 @@ export class Subway {
     // Would also mean that this.arrivalTimes (the array) cannot be trusted as it's incomplete
   }
 
-  getArrivalTimesByStationId(id: string) {
+  getArrivalTimesByStationId(id: string): ArrivalTime[] {
     const hasDirection = ["N", "S"].includes(id.slice(-1));
     if (hasDirection) {
       return this.arrivalTimesMap.get(id) ?? [];
@@ -80,5 +83,15 @@ export class Subway {
         ...(this.arrivalTimesMap.get(id + "S") ?? []),
       ];
     }
+  }
+
+  startRealTimeUpdates(ms: number) {
+    this.realTimeUpdateIntervalId = setInterval(() => {
+      this.syncRealTimeArrivals();
+    }, ms);
+  }
+
+  pauseRealTimeUpdates() {
+    clearInterval(this.realTimeUpdateIntervalId);
   }
 }
