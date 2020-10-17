@@ -3,6 +3,8 @@
   // "strict": true,
   // "sourceMap": true,
   "types": [],
+  "lib": ["dom", "es6", "DOM.Iterable", "ScriptHost", "es2019.array"],
+
 
   "include": ["src/**/*"],
   "exclude": [

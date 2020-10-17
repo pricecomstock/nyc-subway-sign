@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2018",
     "module": "es2015",
-    "lib": ["dom", "es6", "DOM.Iterable", "ScriptHost"],
+    "lib": ["dom", "es6", "DOM.Iterable", "ScriptHost", "es2019.array"],
     "sourceMap": true,
     "rootDir": "./server",
     "outDir": "./server-build",

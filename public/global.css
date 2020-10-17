@@ -13,6 +13,12 @@
 
 @font-face {
   font-family: "Free Sans";
+  font-weight: normal;
+  src: url(/fonts/FreeSans.otf) format("opentype");
+}
+
+@font-face {
+  font-family: "Free Sans";
   font-weight: bold;
   src: url(/fonts/FreeSansBold.otf) format("opentype");
 }
@@ -29,59 +35,68 @@ body {
   margin: 0;
   padding: 8px;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-family: "Free Sans", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+    "Helvetica Neue", sans-serif;
 }
 
-a {
-  color: rgb(0, 100, 200);
-  text-decoration: none;
+.fg-mta-ace {
+  color: var(--mta-ace);
+}
+.fg-mta-bdfm {
+  color: var(--mta-bdfm);
+}
+.fg-mta-g {
+  color: var(--mta-g);
+}
+.fg-mta-jz {
+  color: var(--mta-jz);
+}
+.fg-mta-l {
+  color: var(--mta-l);
+}
+.fg-mta-nqr {
+  color: var(--mta-nqr);
+}
+.fg-mta-s {
+  color: var(--mta-s);
+}
+.fg-mta-123 {
+  color: var(--mta-123);
+}
+.fg-mta-456 {
+  color: var(--mta-456);
+}
+.fg-mta-7 {
+  color: var(--mta-7);
 }
 
-a:hover {
-  text-decoration: underline;
+.bg-mta-ace {
+  background-color: var(--mta-ace);
 }
-
-a:visited {
-  color: rgb(0, 80, 160);
+.bg-mta-bdfm {
+  background-color: var(--mta-bdfm);
 }
-
-label {
-  display: block;
+.bg-mta-g {
+  background-color: var(--mta-g);
 }
-
-input,
-button,
-select,
-textarea {
-  font-family: inherit;
-  font-size: inherit;
-  -webkit-padding: 0.4em 0;
-  padding: 0.4em;
-  margin: 0 0 0.5em 0;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 2px;
+.bg-mta-jz {
+  background-color: var(--mta-jz);
 }
-
-input:disabled {
-  color: #ccc;
+.bg-mta-l {
+  background-color: var(--mta-l);
 }
-
-button {
-  color: #333;
-  background-color: #f4f4f4;
-  outline: none;
+.bg-mta-nqr {
+  background-color: var(--mta-nqr);
 }
-
-button:disabled {
-  color: #999;
+.bg-mta-s {
+  background-color: var(--mta-s);
 }
-
-button:not(:disabled):active {
-  background-color: #ddd;
+.bg-mta-123 {
+  background-color: var(--mta-123);
 }
-
-button:focus {
-  border-color: #666;
+.bg-mta-456 {
+  background-color: var(--mta-456);
+}
+.bg-mta-7 {
+  background-color: var(--mta-7);
 }

@@ -1,5 +1,6 @@
 <script lang="typescript">
   export let train: string;
+  export let size: string;
 </script>
 
 <style>
@@ -9,12 +10,12 @@
   }
 
   .icon {
-    height: 100%;
-    vertical-align: middle;
     display: inline-block;
   }
 </style>
 
-<span class="icon">
-  <img src={`/img/subway-icons/${train.toLowerCase()}.svg`} alt={`${train} icon`}>
+<span class="icon" style={`height: ${size}; width: ${size}`}>
+  {#if train}
+     <img src={`/img/subway-icons/${train.toLowerCase()}.svg`} alt={`${train} icon`}>
+  {/if}
 </span>

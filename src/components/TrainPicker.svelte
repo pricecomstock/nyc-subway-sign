@@ -19,7 +19,6 @@
 <style>
   .container {
     overflow: wrap;
-    height: 30px;
     padding: 0.5rem 0;
   }
 
@@ -33,6 +32,6 @@
   
 <div class="container">
   {#each trains as train, i}
-    <div on:click={() => select(train)} class="option"><TrainIcon train={train}></TrainIcon></div>
+    <div on:click={() => select(train)} class="option"><TrainIcon train={train} size="80px"></TrainIcon></div>
   {/each}
 </div>
