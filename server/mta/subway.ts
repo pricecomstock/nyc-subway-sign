@@ -68,18 +68,18 @@ export class Subway {
       const stationDepartureTimes =
         this.departureTimesMap.get(stationDirection) ?? [];
 
-      // Check if unique before adding
-      // Not sure if this is necessary if replacing whole array
-      // But it's conceivable that different feeds could have same routes
-      // when like D runs on A tracks
-      if (
-        // If not any have same route id
-        !stationDepartureTimes.some(
-          (dt: ArrivalDepartureTime) => dt.routeId === departureTime.routeId
-        )
-      ) {
-        stationDepartureTimes.push(departureTime);
-      }
+      // // Check if unique before adding
+      // // Not sure if this is necessary if replacing whole array
+      // // But it's conceivable that different feeds could have same routes
+      // // when like D runs on A tracks
+      // if (
+      //   // If not any have same route id
+      //   !stationDepartureTimes.some(
+      //     (dt: ArrivalDepartureTime) => dt.routeId === departureTime.routeId
+      //   )
+      // ) {
+      stationDepartureTimes.push(departureTime);
+      // }
 
       this.departureTimesMap.set(stationDirection, stationDepartureTimes);
     });
