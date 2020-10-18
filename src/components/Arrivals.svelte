@@ -4,20 +4,45 @@
   export let arrivals = [];
   export let station = {};
 
+  const numArrivalsPerTrainDirection = 2;
+
   function stationHasDirection(direction) {
     return direction === "N"
       ? station.northDirectionLabel !== ""
       : station.southDirectionLabel !== "";
   }
 
-  // $: trains = new Set(arrivals.map((arrival) => arrival.train));
-  // $: arrivalsByTrain = [...trains].map((train) => {
-  //   return arrivals.filter((arrival) => arrival.train === train)
-  // })
+  $: trains = [...new Set(arrivals.map(({ train }) => train))];
+  $: trainDirections = trains.flatMap((train) => [
+    { train, direction: "S" },
+    { train, direction: "N" },
+  ]);
+  // Map {train, direction} ==> Arrival[]
+  $: arrivalsByTrainDirections = new Map(
+    trainDirections.map((trainDirection) => {
+      console.log("trainDirection", trainDirection);
+      return [
+        trainDirection,
+        arrivals
+          .filter((arrival) => {
+            return (
+              arrival.direction === trainDirection.direction &&
+              arrival.train === trainDirection.train
+            );
+          })
+          .slice(0, numArrivalsPerTrainDirection), // Limit to 2 for each train direction
+      ];
+    })
+  );
+  // $: arrivalsByTrain = [...trainDirections].map((trainDirection) => {
+  //   return arrivals.filter((arrival) => arrival.train === train);
+  // });
   // $: arrivalsByTrainByDirection = arrivalsByTrain.map((arrivalList) => {
   //   return arrivalList
   // })
-  $: relevantArrivals = arrivals
+  // $: relevantArrivals = arrivals
+  $: relevantArrivals = [...arrivalsByTrainDirections.values()]
+    .flat()
     .filter((arrival) => stationHasDirection(arrival.direction))
     .sort((a, b) => a.timestamp - b.timestamp);
   // $: relevantArrivals =
@@ -74,7 +99,7 @@
     <Arrival {arrival} {station} />
   </div>
 {/each}
-<!-- {#each arrivalsByTrainByDirection as abt}
+<!-- {#each [...arrivalsByTrainDirections.values()] as abt}
   {JSON.stringify(abt)}
 {/each} -->
 <!-- {#each relevantArrivals as rArrival}
