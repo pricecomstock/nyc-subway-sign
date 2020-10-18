@@ -31,7 +31,7 @@
 	function pickStation (event) {
 		selectedStation = (event as CustomEvent<{station: string}>).detail.station;
 		getArrivalsForStation(selectedStation);
-		setUpdateEvery(30000)
+		setUpdateEvery(10000)
 	}
 
 	async function updateArrivalTimes() {
@@ -45,8 +45,8 @@
 </script>
 
 <main>
-	<TrainPicker on:select={pickTrain}></TrainPicker> 
 	<Arrivals {arrivals} station={selectedStation}></Arrivals>
+	<TrainPicker on:select={pickTrain}></TrainPicker> 
 	{#if stations.length}
 	<Stations {stations} train={selectedTrain} on:select={pickStation}></Stations>
 	{:else}

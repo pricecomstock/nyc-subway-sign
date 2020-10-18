@@ -4,7 +4,13 @@
   export let station = {};
 
   let debug = false;
-  const arrivingThresholdMs = 5000;
+  
+  let currentMs = Date.now();
+  const arrivingThresholdMs = -20000;
+
+  setInterval(() => {
+    currentMs = Date.now()
+  }, 5000)
 
   function displayMinutesFromMs(ms: number) {
     return Math.max(Math.round(ms / 60000), 0);
@@ -20,7 +26,7 @@
 
   $: arrivalTimestamp = arrival.timestamp * 1000;
   $: directionLabel = arrival.direction === "N" ? station.northDirectionLabel || "End of line" : station.southDirectionLabel || "End of line"
-  $: msRemaining = arrivalTimestamp - Date.now();
+  $: msRemaining = arrivalTimestamp - currentMs;
   $: minutesRemaining = displayMinutesFromMs(msRemaining);
   $: isArrivingSoon = msRemaining < arrivingThresholdMs;
 </script>
@@ -32,9 +38,6 @@
     justify-content: stretch;
     font-size: 3em;
     font-weight: bold;
-
-    border-top: #888 2px solid;
-    padding-top: 10px;
   }
 
   .train-icon {
@@ -68,7 +71,7 @@
       opacity: 0;
     }
   }
-  .arriving > * {
+  .arriving {
     animation: arrivingFlash 1s ease-in infinite alternate;
   }
 </style>
@@ -84,7 +87,7 @@
       <div class="eta">{minutesRemaining} min</div>
       {#if debug}
         <div class="debug">
-          sec: {((arrivalTimestamp - Date.now()) / 1000).toFixed(0)}
+          sec: {(msRemaining/1000).toFixed(0)}
           <br>
           {arrival.tripId}
         </div>

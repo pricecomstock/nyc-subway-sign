@@ -40,7 +40,7 @@ export class Subway {
 
   async instantiate(): Promise<void> {
     await Promise.all([this.downloadStations(), this.syncRealTimeDepartures()]);
-    this.startRealTimeUpdates(60000); // update once per minute
+    this.startRealTimeUpdates(30000); // update once per minute
     return;
   }
 
