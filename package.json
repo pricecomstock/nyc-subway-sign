@@ -10,7 +10,7 @@
     "build-dev-server": "tsc -w -p ./server-tsconfig.json",
     "dev-server": "nodemon -r dotenv/config ./server-build/server.js",
     "build-prod-server": "tsc -p ./server-tsconfig.json",
-    "prod-server": "nodemon ./server-build/server.js"
+    "prod-server": "NODE_ENV=production node ./server-build/server.js"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^14.0.0",

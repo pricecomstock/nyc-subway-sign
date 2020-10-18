@@ -29,7 +29,6 @@
   async function loadFromUrlParams() {
     const query = new URLSearchParams(parent.location.search);
     const queryStation = query.get("station");
-    console.log("Query Params", queryStation);
     if (queryStation) {
       const station = await getStationById(queryStation);
       selectedStation = station;
