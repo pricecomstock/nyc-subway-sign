@@ -37,10 +37,14 @@ api.get("/departures/:station", getDepartureTimesForStation);
 /*=============================
 GET Stations
 =============================*/
-interface getStationsParams {
+interface getStationByGtfsIdParams {
   train: string;
 }
-const getStations: RequestHandler<getStationsParams> = (req, res, _next) => {
+const getStations: RequestHandler<getStationByGtfsIdParams> = (
+  req,
+  res,
+  _next
+) => {
   const train = req.params.train?.toUpperCase();
   let stations = [];
   if (train) {
@@ -52,5 +56,24 @@ const getStations: RequestHandler<getStationsParams> = (req, res, _next) => {
     stations,
   });
 };
-api.get("/stations/:train?", getStations);
+api.get("/stations/:train", getStations);
 api.get("/stations", getStations);
+
+/*=============================
+GET Stations
+=============================*/
+interface getStationByGtfsIdParams {
+  gtfsId: string;
+}
+const getStationByGtfsId: RequestHandler<getStationByGtfsIdParams> = (
+  req,
+  res,
+  _next
+) => {
+  const gtfsId = req.params.gtfsId?.toUpperCase();
+  const station = subway.getStationById(gtfsId);
+  res.send({
+    station,
+  });
+};
+api.get("/station/:gtfsId", getStationByGtfsId);
