@@ -1,31 +1,34 @@
 <script lang="typescript">
-  import TrainIcon from "./TrainIcon.svelte"
+  import TrainIcon from "./TrainIcon.svelte";
   export let arrival = {};
   export let station = {};
 
   let debug = false;
-  
+
   let currentMs = Date.now();
   const arrivingThresholdMs = -20000;
 
   setInterval(() => {
-    currentMs = Date.now()
-  }, 5000)
+    currentMs = Date.now();
+  }, 5000);
 
   function displayMinutesFromMs(ms: number) {
     return Math.max(Math.round(ms / 60000), 0);
   }
 
   function toggleDebug() {
-    console.log("Toggle Debug")
+    console.log("Toggle Debug");
     debug = !debug;
   }
 
-  console.log("Arrival", arrival)
-  console.log("Station", station)
+  console.log("Arrival", arrival);
+  console.log("Station", station);
 
   $: arrivalTimestamp = arrival.timestamp * 1000;
-  $: directionLabel = arrival.direction === "N" ? station.northDirectionLabel || "End of line" : station.southDirectionLabel || "End of line"
+  $: directionLabel =
+    arrival.direction === "N"
+      ? station.northDirectionLabel || "End of line"
+      : station.southDirectionLabel || "End of line";
   $: msRemaining = arrivalTimestamp - currentMs;
   $: minutesRemaining = displayMinutesFromMs(msRemaining);
   $: isArrivingSoon = msRemaining < arrivingThresholdMs;
@@ -44,13 +47,13 @@
     flex: 0 1;
     align-self: baseline;
   }
-  
+
   .direction-label {
     flex: 1 0;
     text-align: left;
     padding-left: 1rem;
   }
-  
+
   .eta {
     flex: 0 1 7ch;
     text-align: right;
@@ -77,20 +80,21 @@
 </style>
 
 {#if arrival.timestamp && station.gtfsStopId}
-   <div class="arrival" class:arriving={isArrivingSoon} on:click={toggleDebug}>
-      <div class="train-icon">
-        <TrainIcon train={arrival.train} size="2em"></TrainIcon>
+  <div class="arrival" class:arriving={isArrivingSoon} on:click={toggleDebug}>
+    <div class="train-icon">
+      <TrainIcon train={arrival.train} size="2em" />
+    </div>
+    <div class="direction-label">{directionLabel}</div>
+    <div class="eta">{minutesRemaining} min</div>
+    {#if debug}
+      <div class="debug">
+        {new Date(arrivalTimestamp).toLocaleTimeString('en-US')}
+        <br />
+        sec:
+        {(msRemaining / 1000).toFixed(0)}
+        <br />
+        {arrival.tripId}
       </div>
-      <div class="direction-label">
-        {directionLabel}
-      </div>
-      <div class="eta">{minutesRemaining} min</div>
-      {#if debug}
-        <div class="debug">
-          sec: {(msRemaining/1000).toFixed(0)}
-          <br>
-          {arrival.tripId}
-        </div>
-      {/if}
-   </div>
+    {/if}
+  </div>
 {/if}
