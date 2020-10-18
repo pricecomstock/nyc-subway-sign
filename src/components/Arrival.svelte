@@ -3,14 +3,26 @@
   export let arrival = {};
   export let station = {};
 
-  function roundedMinutesFromMs(ms: number) {
-    return Math.round(ms / 60000);
+  let debug = false;
+  const arrivingThresholdMs = 5000;
+
+  function displayMinutesFromMs(ms: number) {
+    return Math.max(Math.round(ms / 60000), 0);
+  }
+
+  function toggleDebug() {
+    console.log("Toggle Debug")
+    debug = !debug;
   }
 
   console.log("Arrival", arrival)
   console.log("Station", station)
+
+  $: arrivalTimestamp = arrival.timestamp * 1000;
   $: directionLabel = arrival.direction === "N" ? station.northDirectionLabel || "End of line" : station.southDirectionLabel || "End of line"
-  $: minutesRemaining = roundedMinutesFromMs(new Date(arrival.timestamp * 1000) - Date.now());
+  $: msRemaining = arrivalTimestamp - Date.now();
+  $: minutesRemaining = displayMinutesFromMs(msRemaining);
+  $: isArrivingSoon = msRemaining < arrivingThresholdMs;
 </script>
 
 <style>
@@ -40,16 +52,42 @@
     flex: 0 1 7ch;
     text-align: right;
   }
+
+  .debug {
+    font-size: 0.5em;
+    margin-left: 0.3rem;
+    text-align: left;
+  }
+
+  @keyframes arrivingFlash {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0;
+    }
+  }
+  .arriving > * {
+    animation: arrivingFlash 1s ease-in infinite alternate;
+  }
 </style>
 
 {#if arrival.timestamp && station.gtfsStopId}
-   <div class="arrival">
-     <div class="train-icon">
-       <TrainIcon train={arrival.train} size="2em"></TrainIcon>
-     </div>
-     <div class="direction-label">
-       {directionLabel}
-     </div>
-     <div class="eta">{minutesRemaining} min</div>
+   <div class="arrival" class:arriving={isArrivingSoon} on:click={toggleDebug}>
+      <div class="train-icon">
+        <TrainIcon train={arrival.train} size="2em"></TrainIcon>
+      </div>
+      <div class="direction-label">
+        {directionLabel}
+      </div>
+      <div class="eta">{minutesRemaining} min</div>
+      {#if debug}
+        <div class="debug">
+          sec: {((arrivalTimestamp - Date.now()) / 1000).toFixed(0)}
+          <br>
+          {arrival.tripId}
+        </div>
+      {/if}
    </div>
 {/if}

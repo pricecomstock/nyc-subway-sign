@@ -9,6 +9,7 @@ export class Subway {
   private departureTimesMap: Map<string, ArrivalDepartureTime[]>;
 
   private realTimeUpdateIntervalId: NodeJS.Timeout = setTimeout(() => {}, 0);
+  public lastUpdatedMillis = Date.now();
 
   constructor() {
     this.stations = [];
@@ -57,6 +58,7 @@ export class Subway {
 
   async syncRealTimeDepartures() {
     this.departureTimes = await getDepartureTimes();
+    this.lastUpdatedMillis = Date.now();
     this.departureTimesMap = new Map<string, ArrivalDepartureTime[]>();
     console.log(`${this.departureTimes.length} departure time updates`);
 

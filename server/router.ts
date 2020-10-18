@@ -25,9 +25,11 @@ const getDepartureTimesForStation: RequestHandler<getArrivalTimesParams> = (
   const station = req.params.station.toUpperCase();
   const arrivals = subway.getDepartureTimesByStationId(station);
   const stationInfo = subway.getStationById(station);
+  const lastUpdated = subway.lastUpdatedMillis;
   res.send({
     arrivals,
     stationInfo,
+    lastUpdated,
   });
 };
 api.get("/departures/:station", getDepartureTimesForStation);

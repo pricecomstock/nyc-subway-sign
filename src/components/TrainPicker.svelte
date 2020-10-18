@@ -32,6 +32,6 @@
   
 <div class="container">
   {#each trains as train, i}
-    <div on:click={() => select(train)} class="option"><TrainIcon train={train} size="80px"></TrainIcon></div>
+    <div on:click={() => select(train)} class="option"><TrainIcon train={train} size="60px"></TrainIcon></div>
   {/each}
 </div>
