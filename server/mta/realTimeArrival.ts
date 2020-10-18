@@ -3,18 +3,28 @@ import axios, { AxiosRequestConfig } from "axios";
 
 const MTA_API_KEY: string | undefined = process.env.MTA_API_KEY;
 
-export class ArrivalTime {
+export class ArrivalDepartureTime {
   public readonly stationId: string;
   public readonly direction: string;
   public readonly stationDirection: string;
   public readonly train: string;
   public readonly timestamp: number;
-  constructor(stationDirection: string, train: string, timestamp: number) {
+  public readonly tripId: string;
+  public readonly routeId: string;
+  constructor(
+    stationDirection: string,
+    timestamp: number,
+    train: string,
+    tripId: string,
+    routeId: string
+  ) {
     this.stationDirection = stationDirection;
     this.train = train;
     this.timestamp = timestamp;
     this.stationId = stationDirection.slice(0, -1);
     this.direction = stationDirection.slice(-1); // last character
+    this.tripId = tripId;
+    this.routeId = routeId;
   }
 }
 
@@ -72,37 +82,44 @@ const axiosOptions: AxiosRequestConfig = {
   responseType,
 };
 
-export async function syncArrivalTimesFromURL(url: string) {
+export async function syncDepartureTimesFromURL(url: string) {
   const response = await axios.get(url, axiosOptions);
   const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
     response.data
   );
 
-  const arrivalTimes: ArrivalTime[] = feed.entity
+  const departureTimes: ArrivalDepartureTime[] = feed.entity
     .filter((entity: { tripUpdate?: TripUpdate }) => entity?.tripUpdate)
     .flatMap((entity: TripUpdateEntity) => {
       const train = entity.tripUpdate?.trip?.routeId;
+      const tripId = entity.tripUpdate?.trip?.tripId;
+      const routeId = entity.tripUpdate?.trip?.routeId;
 
       const stopTimeUpdates = entity.tripUpdate?.stopTimeUpdate;
 
       if (stopTimeUpdates) {
         return stopTimeUpdates
-          .filter((stopTime: StopTimeUpdate) => stopTime.arrival) // some only have departures
+          .filter((stopTime: StopTimeUpdate) => stopTime.departure) // some only have departures
           .map((stopTime: StopTimeUpdate) => {
             const station = stopTime.stopId;
-            const timestamp = stopTime.arrival.time.low;
-            return new ArrivalTime(station, train, timestamp);
+            const timestamp = stopTime.departure.time.low;
+            return new ArrivalDepartureTime(
+              station,
+              timestamp,
+              train,
+              tripId,
+              routeId
+            );
           });
       }
 
       return [];
     });
 
-  return arrivalTimes;
+  return departureTimes;
 }
 
-export async function getArrivalTimes(): Promise<ArrivalTime[]> {
-  const arrivals = await Promise.all(API_URLS.map(syncArrivalTimesFromURL));
-  console.log(arrivals[0].slice(0, 10));
+export async function getDepartureTimes(): Promise<ArrivalDepartureTime[]> {
+  const arrivals = await Promise.all(API_URLS.map(syncDepartureTimesFromURL));
   return arrivals.flat();
 }

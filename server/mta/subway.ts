@@ -1,12 +1,12 @@
 import { fetchStations, Station } from "./station.js";
-import { getArrivalTimes, ArrivalTime } from "./realTimeArrival.js";
+import { getDepartureTimes, ArrivalDepartureTime } from "./realTimeArrival.js";
 
 export class Subway {
   private stationsByGTFSId: Map<string, Station>;
   private stationsListByTrain: Map<string, Station[]>;
   private stations: Station[];
-  private arrivalTimes: ArrivalTime[];
-  private arrivalTimesMap: Map<string, ArrivalTime[]>;
+  private departureTimes: ArrivalDepartureTime[];
+  private departureTimesMap: Map<string, ArrivalDepartureTime[]>;
 
   private realTimeUpdateIntervalId: NodeJS.Timeout = setTimeout(() => {}, 0);
 
@@ -15,8 +15,8 @@ export class Subway {
     this.stationsByGTFSId = new Map<string, Station>();
     this.stationsListByTrain = new Map<string, Station[]>();
 
-    this.arrivalTimes = [];
-    this.arrivalTimesMap = new Map<string, ArrivalTime[]>();
+    this.departureTimes = [];
+    this.departureTimesMap = new Map<string, ArrivalDepartureTime[]>();
   }
 
   private async downloadStations() {
@@ -38,7 +38,7 @@ export class Subway {
   }
 
   async instantiate(): Promise<void> {
-    await Promise.all([this.downloadStations(), this.syncRealTimeArrivals()]);
+    await Promise.all([this.downloadStations(), this.syncRealTimeDepartures()]);
     this.startRealTimeUpdates(60000); // update once per minute
     return;
   }
@@ -55,58 +55,49 @@ export class Subway {
     return this.stations;
   }
 
-  async syncRealTimeArrivals() {
-    this.arrivalTimes = await getArrivalTimes();
-    console.log(`${this.arrivalTimes.length} arrival time updates`);
-    this.arrivalTimes.forEach((arrivalTime: ArrivalTime) => {
-      const { stationDirection } = arrivalTime;
-      const existingStationArrivalTimes =
-        this.arrivalTimesMap.get(stationDirection) || [];
+  async syncRealTimeDepartures() {
+    this.departureTimes = await getDepartureTimes();
+    this.departureTimesMap = new Map<string, ArrivalDepartureTime[]>();
+    console.log(`${this.departureTimes.length} departure time updates`);
 
-      // Remove old timestamps
-      const newStationArrivalTimes = existingStationArrivalTimes.filter(
-        ({ timestamp }) => {
-          const isPast = timestamp < Date.now() / 1000;
-          return !isPast;
-        }
-      );
+    this.departureTimes.forEach((departureTime: ArrivalDepartureTime) => {
+      const { stationDirection } = departureTime;
+
+      const stationDepartureTimes =
+        this.departureTimesMap.get(stationDirection) ?? [];
 
       // Check if unique before adding
+      // Not sure if this is necessary if replacing whole array
+      // But it's conceivable that different feeds could have same routes
+      // when like D runs on A tracks
       if (
-        // If not any have same train and time, then add
-        !newStationArrivalTimes.some((at: ArrivalTime) => {
-          at.train === arrivalTime.train &&
-            at.timestamp === arrivalTime.timestamp;
-        })
+        // If not any have same route id
+        !stationDepartureTimes.some(
+          (dt: ArrivalDepartureTime) => dt.routeId === departureTime.routeId
+        )
       ) {
-        newStationArrivalTimes.push(arrivalTime);
+        stationDepartureTimes.push(departureTime);
       }
 
-      this.arrivalTimesMap.set(stationDirection, newStationArrivalTimes);
+      this.departureTimesMap.set(stationDirection, stationDepartureTimes);
     });
   }
 
-  purgePastArrivalTimes() {
-    // TODO if the data coming in is incomplete
-    // Then we need to iterate over the map and remove past arrival times
-    // Would also mean that this.arrivalTimes (the array) cannot be trusted as it's incomplete
-  }
-
-  getArrivalTimesByStationId(id: string): ArrivalTime[] {
+  getDepartureTimesByStationId(id: string): ArrivalDepartureTime[] {
     const hasDirection = ["N", "S"].includes(id.slice(-1));
     if (hasDirection) {
-      return this.arrivalTimesMap.get(id) ?? [];
+      return this.departureTimesMap.get(id) ?? [];
     } else {
       return [
-        ...(this.arrivalTimesMap.get(id + "N") ?? []),
-        ...(this.arrivalTimesMap.get(id + "S") ?? []),
+        ...(this.departureTimesMap.get(id + "N") ?? []),
+        ...(this.departureTimesMap.get(id + "S") ?? []),
       ];
     }
   }
 
   startRealTimeUpdates(ms: number) {
     this.realTimeUpdateIntervalId = setInterval(() => {
-      this.syncRealTimeArrivals();
+      this.syncRealTimeDepartures();
     }, ms);
   }
 

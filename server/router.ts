@@ -17,20 +17,20 @@ GET Arrival Times
 interface getArrivalTimesParams {
   station: string;
 }
-const getArrivalTimesForStation: RequestHandler<getArrivalTimesParams> = (
+const getDepartureTimesForStation: RequestHandler<getArrivalTimesParams> = (
   req,
   res,
   _next
 ) => {
   const station = req.params.station.toUpperCase();
-  const arrivals = subway.getArrivalTimesByStationId(station);
+  const arrivals = subway.getDepartureTimesByStationId(station);
   const stationInfo = subway.getStationById(station);
   res.send({
     arrivals,
     stationInfo,
   });
 };
-api.get("/arrivals/:station", getArrivalTimesForStation);
+api.get("/departures/:station", getDepartureTimesForStation);
 
 /*=============================
 GET Stations

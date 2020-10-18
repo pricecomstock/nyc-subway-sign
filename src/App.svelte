@@ -16,7 +16,7 @@
 
 	async function getArrivalsForStation(station) {
 		const { gtfsStopId } = station
-		const response = await fetch(`http://localhost:3000/api/arrivals/${gtfsStopId}`); // TODO make dynamic
+		const response = await fetch(`http://localhost:3000/api/departures/${gtfsStopId}`); // TODO make dynamic
 		const data = await response.json();
 		arrivals = data.arrivals
 	}
