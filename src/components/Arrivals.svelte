@@ -4,9 +4,11 @@
   export let station = {};
   export let options = {
     maxArrivals: 10,
+    maxArrivalsPerTrainDirection: 2,
+    hiddenTrainDirections: [],
+    soonestTrainArrival: -60000,
+    latestTrainArrival: 3600000,
   };
-
-  const numArrivalsPerTrainDirection = 2;
 
   function stationHasDirection(direction) {
     return direction === "N"
@@ -19,24 +21,53 @@
     { train, direction: "S" },
     { train, direction: "N" },
   ]);
+  $: filteredArrivals = arrivals.filter((arrival) => {
+    const matchingHiddenTrainDirection = options.hiddenTrainDirections.some(
+      (trainDirection) => {
+        return (
+          trainDirection.train === arrival.train &&
+          trainDirection.direction === arrival.direction
+        );
+      }
+    );
+    const arrivalMs = arrival.timestamp * 1000 - Date.now();
+
+    console.log("arrivalMs", arrivalMs);
+    // console.log(
+    //   "matching hidden train direction ",
+    //   matchingHiddenTrainDirection
+    // );
+    // console.log("late enough", arrivalMs > options.soonestTrainArrival);
+    // console.log("soon enough", arrivalMs < options.latestTrainArrival);
+    const keep =
+      arrivalMs > options.soonestTrainArrival &&
+      arrivalMs < options.latestTrainArrival &&
+      !matchingHiddenTrainDirection;
+
+    // console.log(keep, "keeping", arrival);
+
+    return keep;
+  });
   // Map {train, direction} ==> Arrival[]
   $: arrivalsByTrainDirections = new Map(
     trainDirections.map((trainDirection) => {
       console.log("trainDirection", trainDirection);
       return [
         trainDirection,
-        arrivals
+        filteredArrivals
           .filter((arrival) => {
             return (
               arrival.direction === trainDirection.direction &&
               arrival.train === trainDirection.train
             );
           })
-          .slice(0, numArrivalsPerTrainDirection), // Limit to 2 for each train direction
+          .slice(0, options.maxArrivalsPerTrainDirection), // Limit to 2 for each train direction
       ];
     })
   );
 
+  $: console.log("arrivals", arrivals);
+  $: console.log("filtered", filteredArrivals);
   $: console.log("ABTD", arrivalsByTrainDirections);
   // $: arrivalsByTrain = [...trainDirections].map((trainDirection) => {
   //   return arrivals.filter((arrival) => arrival.train === train);
@@ -48,7 +79,8 @@
   $: relevantArrivals = [...arrivalsByTrainDirections.values()]
     .flat()
     .filter((arrival) => stationHasDirection(arrival.direction))
-    .sort((a, b) => a.timestamp - b.timestamp);
+    .sort((a, b) => a.timestamp - b.timestamp)
+    .slice(0, options.maxArrivals);
   // $: relevantArrivals =
   // [...trains].map((train) => {
   //   return arrivals
