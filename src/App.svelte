@@ -8,8 +8,13 @@
   let selectedStation = {};
   let stations = [];
   let arrivals = [];
+  let showTrainPicker = false;
 
   let intervalId;
+
+  const baseUrl = __IS_DEVELOPMENT__
+    ? "http://localhost:3000"
+    : parent.location.origin;
 
   onMount(async () => {
     await loadFromUrlParams();
@@ -30,39 +35,40 @@
     const query = new URLSearchParams(parent.location.search);
     const queryStation = query.get("station");
     if (queryStation) {
+      showTrainPicker = false;
       const station = await getStationById(queryStation);
       selectedStation = station;
       await initializeForSelectedStation();
+    } else {
+      showTrainPicker = true;
     }
   }
 
   async function getStationsForTrain(train) {
-    const response = await fetch(`http://localhost:3000/api/stations/${train}`);
+    const response = await fetch(`${baseUrl}/api/stations/${train}`);
     const data = await response.json();
     stations = data.stations;
   }
 
   async function getStationById(gtfsId: string) {
-    const response = await fetch(`http://localhost:3000/api/station/${gtfsId}`);
+    const response = await fetch(`${baseUrl}/api/station/${gtfsId}`);
     const data = await response.json();
     return data.station;
   }
 
   async function getArrivalsForStation(station) {
     const { gtfsStopId } = station;
-    const response = await fetch(
-      `http://localhost:3000/api/departures/${gtfsStopId}`
-    );
+    const response = await fetch(`${baseUrl}/api/departures/${gtfsStopId}`);
     const data = await response.json();
     arrivals = data.arrivals;
   }
 
-  function pickTrain(event) {
+  function handlePickTrainEvent(event) {
     selectedTrain = (event as CustomEvent<{ train: string }>).detail.train;
     getStationsForTrain(selectedTrain);
   }
 
-  function pickStation(event) {
+  function handlePickStationEvent(event) {
     selectedStation = (event as CustomEvent<{ station: string }>).detail
       .station;
     writeUrlParams();
@@ -104,14 +110,18 @@
 
 <main>
   <Arrivals {arrivals} station={selectedStation} />
-  <TrainPicker on:select={pickTrain} />
-  {#if stations.length}
-    <Stations {stations} train={selectedTrain} on:select={pickStation} />
-  {:else}
-    <p>Pick a train</p>
-    <p class="disclaimer">
-      Due to lag time in the MTA real-time feeds, information may not be
-      accurate
-    </p>
+  {#if showTrainPicker}
+    <TrainPicker on:select={handlePickTrainEvent} />
+    {#if stations.length}
+      <Stations
+        {stations}
+        train={selectedTrain}
+        on:select={handlePickStationEvent} />
+    {:else}
+      <p>Pick a train</p>
+    {/if}
   {/if}
+  <p class="disclaimer">
+    Due to lag time in the MTA real-time feeds, information may not be accurate
+  </p>
 </main>
