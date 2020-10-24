@@ -2,6 +2,7 @@
   import TrainPicker from "./components/TrainPicker.svelte";
   import Stations from "./components/Stations.svelte";
   import Arrivals from "./components/Arrivals.svelte";
+  import StationTitle from "./components/StationTitle.svelte";
   import { onMount } from "svelte";
 
   let selectedTrain = "";
@@ -73,12 +74,13 @@
       .station;
     writeUrlParams();
     initializeForSelectedStation();
+    showTrainPicker = false;
   }
 
   async function initializeForSelectedStation() {
     console.log("initializing");
     await updateArrivalTimes();
-    setUpdateEvery(10000);
+    setUpdateEvery(30000);
   }
 
   async function updateArrivalTimes() {
@@ -106,10 +108,17 @@
     font-size: 0.75rem;
     color: var(--mta-s);
   }
+
+  button {
+    font-size: 0.7em;
+  }
 </style>
 
 <main>
-  <Arrivals {arrivals} station={selectedStation} />
+  <button
+    on:click={() => {
+      showTrainPicker = !showTrainPicker;
+    }}>show station picker</button>
   {#if showTrainPicker}
     <TrainPicker on:select={handlePickTrainEvent} />
     {#if stations.length}
@@ -121,6 +130,12 @@
       <p>Pick a train</p>
     {/if}
   {/if}
+  <StationTitle
+    station={selectedStation}
+    on:pickNewStation={() => {
+      showTrainPicker = true;
+    }} />
+  <Arrivals {arrivals} station={selectedStation} />
   <p class="disclaimer">
     Due to lag time in the MTA real-time feeds, information may not be accurate
   </p>

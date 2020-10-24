@@ -1,8 +1,10 @@
 <script lang="typescript">
-  import TrainIcon from "./TrainIcon.svelte";
   import Arrival from "./Arrival.svelte";
   export let arrivals = [];
   export let station = {};
+  export let options = {
+    maxArrivals: 10,
+  };
 
   const numArrivalsPerTrainDirection = 2;
 
@@ -34,6 +36,8 @@
       ];
     })
   );
+
+  $: console.log("ABTD", arrivalsByTrainDirections);
   // $: arrivalsByTrain = [...trainDirections].map((trainDirection) => {
   //   return arrivals.filter((arrival) => arrival.train === train);
   // });
@@ -69,36 +73,15 @@
   .arrival-container:last-child {
     border-bottom: #888 2px solid;
   }
-
-  .station-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 1rem 0;
-  }
-
-  .station-title span {
-    margin: 0 0.1rem;
-  }
-  .station-title h1 {
-    font-size: 3rem;
-    margin: 0 0.5rem;
-  }
 </style>
 
-{#if station.stopName}
-  <div class="station-title">
-    {#each station.trains as train}
-      <span><TrainIcon {train} size="2.5rem" /></span>
-    {/each}
-    <h1>{station.stopName}</h1>
-  </div>
-{/if}
-{#each relevantArrivals as arrival}
-  <div class="arrival-container">
-    <Arrival {arrival} {station} />
-  </div>
-{/each}
+<div>
+  {#each relevantArrivals as arrival}
+    <div class="arrival-container">
+      <Arrival {arrival} {station} />
+    </div>
+  {/each}
+</div>
 <!-- {#each [...arrivalsByTrainDirections.values()] as abt}
   {JSON.stringify(abt)}
 {/each} -->

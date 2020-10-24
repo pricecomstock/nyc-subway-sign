@@ -1,21 +1,44 @@
 <script lang="typescript">
-  import TrainIcon from "./TrainIcon.svelte"
-  import {createEventDispatcher} from "svelte";
+  import TrainIcon from "./TrainIcon.svelte";
+  import { createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
 
-  const trains = ["A", "C", "E", "B", "D", "F", "M", "G", "J", "Z", "L", "N", "Q", "R", "S", "1", "2", "3", "4", "5", "6", "7" ]
-  
-  let selected = ""
+  const trains = [
+    "A",
+    "C",
+    "E",
+    "B",
+    "D",
+    "F",
+    "M",
+    "G",
+    "J",
+    "Z",
+    "L",
+    "N",
+    "Q",
+    "R",
+    "S",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+  ];
+
+  let selected = "";
 
   function select(train: string) {
     selected = train;
     dispatch("select", {
-      train
-    })
+      train,
+    });
   }
 </script>
-  
+
 <style>
   .container {
     overflow: wrap;
@@ -29,9 +52,11 @@
     cursor: pointer;
   }
 </style>
-  
+
 <div class="container">
   {#each trains as train, i}
-    <div on:click={() => select(train)} class="option"><TrainIcon train={train} size="60px"></TrainIcon></div>
+    <div on:click={() => select(train)} class="option">
+      <TrainIcon {train} size="50px" />
+    </div>
   {/each}
 </div>
