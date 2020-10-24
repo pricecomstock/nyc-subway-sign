@@ -16,11 +16,10 @@ ENV NODE_ENV production
 
 RUN npm run build
 RUN npm run build-prod-server
-RUN npm run prod-server
 
 EXPOSE 80
 
-CMD ["node", "./server/server.js"]
+CMD ["npm", "run", "prod-server"]
 
 # production stage
 # FROM nginx:1.13.12-alpine as production-stage
