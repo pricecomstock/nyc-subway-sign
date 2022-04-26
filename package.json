@@ -5,6 +5,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
+    "start": "sirv public",
     "validate": "svelte-check",
     "build-dev-server": "tsc -w -p ./server-tsconfig.json",
     "dev-server": "nodemon -r dotenv/config ./server-build/server.js",
