@@ -1,7 +1,10 @@
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
-import axios, { AxiosRequestConfig } from "axios";
+import fetch from "node-fetch";
 
-const MTA_API_KEY: string | undefined = process.env.MTA_API_KEY;
+const MTA_API_KEY: string = process.env.MTA_API_KEY ?? "";
+if (MTA_API_KEY === "") {
+  throw new Error("Missing MTA API Key");
+}
 
 export class ArrivalDepartureTime {
   public readonly stationId: string;
@@ -70,23 +73,22 @@ const API_URLS = [
   "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz",
   "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw",
   "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l",
-  "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",
-  "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-7",
+  "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs", // 1 2 3 4 5 6
 ];
 
 const headers = { "x-api-key": MTA_API_KEY };
-const responseType = "arraybuffer";
-
-const axiosOptions: AxiosRequestConfig = {
-  headers,
-  responseType,
-};
 
 export async function syncDepartureTimesFromURL(url: string) {
-  const response = await axios.get(url, axiosOptions);
-  const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
-    response.data
-  );
+  console.log("Syncing from URL:", url);
+
+  const response = await fetch(url, {
+    headers,
+    method: "GET",
+  });
+
+  const data = new Uint8Array(await response.arrayBuffer());
+
+  const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(data);
 
   const departureTimes: ArrivalDepartureTime[] = feed.entity
     .filter((entity: { tripUpdate?: TripUpdate }) => entity?.tripUpdate)
