@@ -1,5 +1,6 @@
 <script lang="typescript">
   import Arrival from "./Arrival.svelte";
+  import { DisplayOptions } from "../DisplaySpec";
   export let arrivals = [];
   export let station = {};
   export let options = {
