@@ -94,6 +94,45 @@
   }
 </script>
 
+<main>
+  <Arrivals {arrivals} station={selectedStation} />
+  {#if showTrainPicker}
+    <TrainPicker on:select={handlePickTrainEvent} />
+    {#if stations.length}
+      <Stations
+        {stations}
+        train={selectedTrain}
+        on:select={handlePickStationEvent}
+      />
+    {:else}
+      <p>Pick a train</p>
+    {/if}
+  {/if}
+  <div class="footer">
+    <div class="station-title-and-picker">
+      <span>
+        <StationTitle
+          station={selectedStation}
+          on:pickNewStation={() => {
+            showTrainPicker = true;
+          }}
+        />
+      </span>
+      <span>
+        <button
+          on:click={() => {
+            showTrainPicker = !showTrainPicker;
+          }}>show station picker</button
+        >
+      </span>
+    </div>
+    <p class="disclaimer">
+      Due to lag time in the MTA real-time feeds, information may not be
+      accurate
+    </p>
+  </div>
+</main>
+
 <style>
   div {
     height: 40px;
@@ -109,34 +148,23 @@
     color: var(--mta-s);
   }
 
+  .station-title-and-picker {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+  }
+
+  .footer > * {
+    flex: 0 1 auto;
+  }
+
   button {
     font-size: 0.7em;
   }
 </style>
-
-<main>
-  <button
-    on:click={() => {
-      showTrainPicker = !showTrainPicker;
-    }}>show station picker</button>
-  {#if showTrainPicker}
-    <TrainPicker on:select={handlePickTrainEvent} />
-    {#if stations.length}
-      <Stations
-        {stations}
-        train={selectedTrain}
-        on:select={handlePickStationEvent} />
-    {:else}
-      <p>Pick a train</p>
-    {/if}
-  {/if}
-  <StationTitle
-    station={selectedStation}
-    on:pickNewStation={() => {
-      showTrainPicker = true;
-    }} />
-  <Arrivals {arrivals} station={selectedStation} />
-  <p class="disclaimer">
-    Due to lag time in the MTA real-time feeds, information may not be accurate
-  </p>
-</main>
