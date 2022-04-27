@@ -1,7 +1,9 @@
 import { fetchStations, Station } from "./station.js";
 import { getDepartureTimes, ArrivalDepartureTime } from "./realTimeArrival.js";
+import { UPDATE_INTERVAL_MS } from "../config.js";
 
 export class Subway {
+  private updateIntervalMs: number;
   private stationsByGTFSId: Map<string, Station>;
   private stationsListByTrain: Map<string, Station[]>;
   private stations: Station[];
@@ -18,6 +20,8 @@ export class Subway {
 
     this.departureTimes = [];
     this.departureTimesMap = new Map<string, ArrivalDepartureTime[]>();
+
+    this.updateIntervalMs = UPDATE_INTERVAL_MS;
   }
 
   private async downloadStations() {
@@ -40,7 +44,7 @@ export class Subway {
 
   async instantiate(): Promise<void> {
     await Promise.all([this.downloadStations(), this.syncRealTimeDepartures()]);
-    this.startRealTimeUpdates(30000); // update once per minute
+    this.startRealTimeUpdates(this.updateIntervalMs); // update once per minute
     return;
   }
 
@@ -97,13 +101,15 @@ export class Subway {
     }
   }
 
-  startRealTimeUpdates(ms: number) {
+  startRealTimeUpdates(intervalMs: number) {
+    console.log(`Pulling data from MTA every ${intervalMs / 1000} seconds`);
     this.realTimeUpdateIntervalId = setInterval(() => {
       this.syncRealTimeDepartures();
-    }, ms);
+    }, intervalMs);
   }
 
   pauseRealTimeUpdates() {
+    console.log(`Pausing data pull from MTA`);
     clearInterval(this.realTimeUpdateIntervalId);
   }
 }

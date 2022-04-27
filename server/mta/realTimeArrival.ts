@@ -1,7 +1,6 @@
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import axios, { AxiosRequestConfig } from "axios";
-
-const MTA_API_KEY: string = process.env.MTA_API_KEY ?? "";
+import { MTA_API_KEY } from "../config.js";
 
 if (MTA_API_KEY === "") {
   throw new Error("No MTA API Key provided");
@@ -87,6 +86,7 @@ const axiosOptions: AxiosRequestConfig = {
 
 export async function syncDepartureTimesFromURL(url: string) {
   const response = await axios.get(url, axiosOptions);
+
   const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
     response.data
   );
