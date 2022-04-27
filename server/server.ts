@@ -13,11 +13,12 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ message: err.message });
 });
 
+const corsOpts = cors();
 if (process.env.NODE_ENV === "production") {
   app.use("/api", api);
 } else {
-  app.options("*", cors());
-  app.use("/api", cors(), api);
+  app.options("*", corsOpts);
+  app.use("/api", corsOpts, api);
 }
 
 // Static serve of build folder
