@@ -8,6 +8,8 @@
   let currentMs = Date.now();
   const arrivingThresholdMs = -20000;
 
+  let fontSizeRem = 1.8;
+
   setInterval(() => {
     currentMs = Date.now();
   }, 5000);
@@ -34,12 +36,36 @@
   $: isArrivingSoon = msRemaining < arrivingThresholdMs;
 </script>
 
+{#if arrival.timestamp && station.gtfsStopId}
+  <div
+    class="arrival"
+    style={`font-size:${fontSizeRem}rem`}
+    class:arriving={isArrivingSoon}
+    on:click={toggleDebug}
+  >
+    <div class="train-icon">
+      <TrainIcon train={arrival.train} size="2em" />
+    </div>
+    <div class="direction-label">{directionLabel}</div>
+    <div class="eta">{minutesRemaining} min</div>
+    {#if debug}
+      <div class="debug">
+        {new Date(arrivalTimestamp).toLocaleTimeString("en-US")}
+        <br />
+        sec:
+        {(msRemaining / 1000).toFixed(0)}
+        <br />
+        {arrival.tripId}
+      </div>
+    {/if}
+  </div>
+{/if}
+
 <style>
   .arrival {
     display: flex;
     align-items: center;
     justify-content: stretch;
-    font-size: 3em;
     font-weight: bold;
   }
 
@@ -78,23 +104,3 @@
     animation: arrivingFlash 1s ease-in infinite alternate;
   }
 </style>
-
-{#if arrival.timestamp && station.gtfsStopId}
-  <div class="arrival" class:arriving={isArrivingSoon} on:click={toggleDebug}>
-    <div class="train-icon">
-      <TrainIcon train={arrival.train} size="2em" />
-    </div>
-    <div class="direction-label">{directionLabel}</div>
-    <div class="eta">{minutesRemaining} min</div>
-    {#if debug}
-      <div class="debug">
-        {new Date(arrivalTimestamp).toLocaleTimeString('en-US')}
-        <br />
-        sec:
-        {(msRemaining / 1000).toFixed(0)}
-        <br />
-        {arrival.tripId}
-      </div>
-    {/if}
-  </div>
-{/if}

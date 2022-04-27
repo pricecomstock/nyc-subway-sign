@@ -39,6 +39,14 @@
   }
 </script>
 
+<div class="container">
+  {#each trains as train, i}
+    <div on:click={() => select(train)} class="option">
+      <TrainIcon {train} size="50px" />
+    </div>
+  {/each}
+</div>
+
 <style>
   .container {
     overflow: wrap;
@@ -52,11 +60,3 @@
     cursor: pointer;
   }
 </style>
-
-<div class="container">
-  {#each trains as train, i}
-    <div on:click={() => select(train)} class="option">
-      <TrainIcon {train} size="50px" />
-    </div>
-  {/each}
-</div>

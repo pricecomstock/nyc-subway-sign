@@ -95,18 +95,6 @@
   // .sort((a, b) => a.timestamp - b.timestamp)
 </script>
 
-<style>
-  /* your styles go here */
-  .arrival-container {
-    border-top: #888 2px solid;
-    padding-top: 10px;
-  }
-
-  .arrival-container:last-child {
-    border-bottom: #888 2px solid;
-  }
-</style>
-
 <div>
   {#each relevantArrivals as arrival}
     <div class="arrival-container">
@@ -117,6 +105,14 @@
 <!-- {#each [...arrivalsByTrainDirections.values()] as abt}
   {JSON.stringify(abt)}
 {/each} -->
+
 <!-- {#each relevantArrivals as rArrival}
    <p>{rArrival.stationDirection} - {rArrival.train}: {(rArrival.timestamp - Date.now()/1000).toFixed()}</p>
 {/each} -->
+<style>
+  /* your styles go here */
+  .arrival-container {
+    border-bottom: #888 2px solid;
+    padding-top: 10px;
+  }
+</style>
