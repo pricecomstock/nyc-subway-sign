@@ -1,9 +1,10 @@
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
-import fetch from "node-fetch";
+import axios, { AxiosRequestConfig } from "axios";
 
 const MTA_API_KEY: string = process.env.MTA_API_KEY ?? "";
+
 if (MTA_API_KEY === "") {
-  throw new Error("Missing MTA API Key");
+  throw new Error("No MTA API Key provided");
 }
 
 export class ArrivalDepartureTime {
@@ -77,18 +78,18 @@ const API_URLS = [
 ];
 
 const headers = { "x-api-key": MTA_API_KEY };
+const responseType = "arraybuffer";
+
+const axiosOptions: AxiosRequestConfig = {
+  headers,
+  responseType,
+};
 
 export async function syncDepartureTimesFromURL(url: string) {
-  console.log("Syncing from URL:", url);
-
-  const response = await fetch(url, {
-    headers,
-    method: "GET",
-  });
-
-  const data = new Uint8Array(await response.arrayBuffer());
-
-  const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(data);
+  const response = await axios.get(url, axiosOptions);
+  const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
+    response.data
+  );
 
   const departureTimes: ArrivalDepartureTime[] = feed.entity
     .filter((entity: { tripUpdate?: TripUpdate }) => entity?.tripUpdate)

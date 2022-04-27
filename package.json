@@ -42,7 +42,6 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "gtfs-realtime-bindings": "0.0.6",
-    "node-fetch": "^3.2.3",
     "sirv-cli": "^1.0.0"
   }
 }
