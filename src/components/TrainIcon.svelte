@@ -3,8 +3,17 @@
   export let size: string;
 </script>
 
+<span class="icon" style={`height: ${size}; width: ${size}`}>
+  {#if train}
+    <img
+      src={`/img/subway-icons/${train.toLowerCase()}.svg`}
+      alt={`${train}`}
+    />
+  {/if}
+</span>
+
 <style>
-  img{
+  img {
     height: 100%;
     width: auto;
   }
@@ -13,9 +22,3 @@
     display: inline-block;
   }
 </style>
-
-<span class="icon" style={`height: ${size}; width: ${size}`}>
-  {#if train}
-     <img src={`/img/subway-icons/${train.toLowerCase()}.svg`} alt={`${train} icon`}>
-  {/if}
-</span>
