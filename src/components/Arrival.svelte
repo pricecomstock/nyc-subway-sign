@@ -43,9 +43,9 @@
     class:arriving={isArrivingSoon}
     on:click={toggleDebug}
   >
-    <div class="train-icon">
-      <TrainIcon train={arrival.train} size="2em" />
-    </div>
+    <!-- <div class="train-icon"> -->
+    <TrainIcon train={arrival.train} size="2em" />
+    <!-- </div> -->
     <div class="direction-label">{directionLabel}</div>
     <div class="eta">{minutesRemaining} min</div>
     {#if debug}

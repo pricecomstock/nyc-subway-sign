@@ -122,7 +122,7 @@
         <button
           on:click={() => {
             showTrainPicker = !showTrainPicker;
-          }}>show station picker</button
+          }}>change</button
         >
       </span>
     </div>
@@ -151,6 +151,13 @@
   .station-title-and-picker {
     display: inline-flex;
     align-items: center;
+    flex: 1 0 70%;
+    align-self: left;
+  }
+
+  .disclaimer {
+    flex: 0 1 30%;
+    align-self: right;
   }
 
   .footer {
@@ -158,10 +165,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0;
-  }
-
-  .footer > * {
-    flex: 0 1 auto;
   }
 
   button {

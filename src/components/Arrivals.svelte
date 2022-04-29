@@ -4,7 +4,7 @@
   export let station = {};
   export let options = {
     maxArrivals: 10,
-    maxArrivalsPerTrainDirection: 2,
+    maxArrivalsPerTrainDirection: 3,
     hiddenTrainDirections: [],
     soonestTrainArrival: -60000,
     latestTrainArrival: 3600000,
@@ -113,6 +113,6 @@
   /* your styles go here */
   .arrival-container {
     border-bottom: #888 2px solid;
-    padding-top: 10px;
+    padding: 8px 0;
   }
 </style>
