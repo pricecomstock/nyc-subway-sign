@@ -1,4 +1,5 @@
 function push {
+  docker build --platform linux/amd64 --no-cache --tag=nyc-subway-sign . 
   docker tag nyc-subway-sign pricecomstock/nyc-subway-sign
   docker push pricecomstock/nyc-subway-sign:latest
 }
@@ -8,7 +9,7 @@ function testcontainer {
   echo "Do you still wish to deploy? This will rebuild the container for x64"
   select yn in "Yes" "No"; do
       case $yn in
-          Yes ) docker build --platform linux/amd64 --no-cache --tag=nyc-subway-sign . && push; break;;
+          Yes ) push; break;;
           No ) break;;
       esac
   done
