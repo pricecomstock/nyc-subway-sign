@@ -1,12 +1,14 @@
-import { fetchStations, Station } from "./station.js";
+import {
+  Station,
+  stations,
+  getStationById,
+  getStationListByTrain,
+} from "./station.js";
 import { getDepartureTimes, ArrivalDepartureTime } from "./realTimeArrival.js";
 import { UPDATE_INTERVAL_MS } from "../config.js";
 
 export class Subway {
   private updateIntervalMs: number;
-  private stationsByGTFSId: Map<string, Station>;
-  private stationsListByTrain: Map<string, Station[]>;
-  private stations: Station[];
   private departureTimes: ArrivalDepartureTime[];
   private departureTimesMap: Map<string, ArrivalDepartureTime[]>;
 
@@ -14,50 +16,28 @@ export class Subway {
   public lastUpdatedMillis = Date.now();
 
   constructor() {
-    this.stations = [];
-    this.stationsByGTFSId = new Map<string, Station>();
-    this.stationsListByTrain = new Map<string, Station[]>();
-
     this.departureTimes = [];
     this.departureTimesMap = new Map<string, ArrivalDepartureTime[]>();
 
     this.updateIntervalMs = UPDATE_INTERVAL_MS;
   }
 
-  private async downloadStations() {
-    this.stations = await fetchStations();
-    this.stationsByGTFSId = new Map(
-      this.stations.map((station: Station) => {
-        return [station.gtfsStopId, station];
-      })
-    );
-
-    this.stationsListByTrain = this.stations.reduce((accMap, station) => {
-      station.trains.forEach((train) => {
-        const stationsForTrain = accMap.get(train) ?? [];
-        stationsForTrain.push(station);
-        accMap.set(train, stationsForTrain);
-      });
-      return accMap;
-    }, new Map());
-  }
-
   async instantiate(): Promise<void> {
-    await Promise.all([this.downloadStations(), this.syncRealTimeDepartures()]);
+    await this.syncRealTimeDepartures();
     this.startRealTimeUpdates(this.updateIntervalMs); // update once per minute
     return;
   }
 
   getStationById(id: string): Station | undefined {
-    return this.stationsByGTFSId.get(id.toUpperCase());
+    return getStationById(id);
   }
 
   getStationListByTrain(train: string): Station[] {
-    return this.stationsListByTrain.get(train.toUpperCase()) ?? [];
+    return getStationListByTrain(train);
   }
 
   getAllStations(): Station[] {
-    return this.stations;
+    return stations;
   }
 
   async syncRealTimeDepartures() {

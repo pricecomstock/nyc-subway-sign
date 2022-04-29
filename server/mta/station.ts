@@ -86,3 +86,26 @@ function fetchStationCSVLocally(): string {
   const stations = fs.readFileSync(filePath).toString();
   return stations;
 }
+
+export const stations = await fetchStations();
+export const stationsByGTFSId = new Map(
+  stations.map((station: Station) => {
+    return [station.gtfsStopId, station];
+  })
+);
+export const stationsListByTrain = stations.reduce((accMap, station) => {
+  station.trains.forEach((train) => {
+    const stationsForTrain = accMap.get(train) ?? [];
+    stationsForTrain.push(station);
+    accMap.set(train, stationsForTrain);
+  });
+  return accMap;
+}, new Map());
+
+export function getStationById(id: string): Station | undefined {
+  return stationsByGTFSId.get(id.toUpperCase());
+}
+
+export function getStationListByTrain(train: string): Station[] {
+  return stationsListByTrain.get(train.toUpperCase()) ?? [];
+}
