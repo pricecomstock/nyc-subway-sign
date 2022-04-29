@@ -101,7 +101,7 @@ export async function syncDepartureTimesFromURL(url: string) {
       const train = entity.tripUpdate?.trip?.routeId;
       const tripId = entity.tripUpdate?.trip?.tripId;
       const routeId = entity.tripUpdate?.trip?.routeId;
-      const terminalStopId = entity.tripUpdate.stopTimeUpdate[
+      const terminalStopId = entity.tripUpdate?.stopTimeUpdate[
         entity.tripUpdate.stopTimeUpdate.length - 1
       ]?.stopId.slice(0, -1);
 
