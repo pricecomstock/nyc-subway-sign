@@ -7,12 +7,12 @@ WORKDIR /app
 COPY package*.json ./
 
 # install everything
+ENV NODE_ENV production
 RUN npm install
 
 COPY . .
 
 ENV PORT 80
-ENV NODE_ENV production
 
 RUN npm run build
 RUN npm run build-prod-server

@@ -4,11 +4,11 @@ function push {
 }
 
 function testcontainer {
-  docker run -p 5000:80 nyc-subway-sign > /dev/null &
-  echo "Do you still wish to deploy?"
+  docker run --env-file .env -p 5000:80 nyc-subway-sign > /dev/null &
+  echo "Do you still wish to deploy? This will rebuild the container for x64"
   select yn in "Yes" "No"; do
       case $yn in
-          Yes ) push; break;;
+          Yes ) docker build --platform linux/amd64 --no-cache --tag=nyc-subway-sign . && push; break;;
           No ) break;;
       esac
   done
