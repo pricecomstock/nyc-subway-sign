@@ -23,14 +23,16 @@
     debug = !debug;
   }
 
-  console.log("Arrival", arrival);
+  console.log("Arrival", arrival.directionName);
   console.log("Station", station);
 
-  $: arrivalTimestamp = arrival.timestamp * 1000;
-  $: directionLabel =
+  let defaultStationLabel =
     arrival.direction === "N"
       ? station.northDirectionLabel || "End of line"
       : station.southDirectionLabel || "End of line";
+
+  $: arrivalTimestamp = arrival.timestamp * 1000;
+  $: directionLabel = arrival.directionName || defaultStationLabel;
   $: msRemaining = arrivalTimestamp - currentMs;
   $: minutesRemaining = displayMinutesFromMs(msRemaining);
   $: isArrivingSoon = msRemaining < arrivingThresholdMs;

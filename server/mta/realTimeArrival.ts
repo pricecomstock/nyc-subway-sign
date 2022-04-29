@@ -1,6 +1,7 @@
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import axios, { AxiosRequestConfig } from "axios";
 import { MTA_API_KEY } from "../config.js";
+import { getStationById } from "./station.js";
 
 if (MTA_API_KEY === "") {
   throw new Error("No MTA API Key provided");
@@ -14,12 +15,14 @@ export class ArrivalDepartureTime {
   public readonly timestamp: number;
   public readonly tripId: string;
   public readonly routeId: string;
+  public readonly directionName: string;
   constructor(
     stationDirection: string,
     timestamp: number,
     train: string,
     tripId: string,
-    routeId: string
+    routeId: string,
+    directionName: string
   ) {
     this.stationDirection = stationDirection;
     this.train = train;
@@ -28,6 +31,7 @@ export class ArrivalDepartureTime {
     this.direction = stationDirection.slice(-1); // last character
     this.tripId = tripId;
     this.routeId = routeId;
+    this.directionName = directionName;
   }
 }
 
@@ -97,6 +101,9 @@ export async function syncDepartureTimesFromURL(url: string) {
       const train = entity.tripUpdate?.trip?.routeId;
       const tripId = entity.tripUpdate?.trip?.tripId;
       const routeId = entity.tripUpdate?.trip?.routeId;
+      const terminalStopId = entity.tripUpdate.stopTimeUpdate[
+        entity.tripUpdate.stopTimeUpdate.length - 1
+      ]?.stopId.slice(0, -1);
 
       const stopTimeUpdates = entity.tripUpdate?.stopTimeUpdate;
 
@@ -106,13 +113,17 @@ export async function syncDepartureTimesFromURL(url: string) {
           .map((stopTime: StopTimeUpdate) => {
             const station = stopTime.stopId;
             const timestamp = stopTime.departure.time.low;
-            return new ArrivalDepartureTime(
+            const adt = new ArrivalDepartureTime(
               station,
               timestamp,
               train,
               tripId,
-              routeId
+              routeId,
+              getStationById(terminalStopId)?.stopName ?? ""
             );
+            if (/A46/.test(station))
+              console.log("🔴====> ~ file: realTimeArrival.ts ~ ", adt);
+            return adt;
           });
       }
 
