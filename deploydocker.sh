@@ -5,7 +5,7 @@ function push {
 }
 
 function testcontainer {
-  docker run --env-file .env -p 5000:80 nyc-subway-sign > /dev/null &
+  docker run --name nyc-subway-sign-test --env-file .env -p 5000:80 nyc-subway-sign > /dev/null &
   echo "Do you still wish to deploy? This will rebuild the container for x64"
   select yn in "Yes" "No"; do
       case $yn in
@@ -13,6 +13,7 @@ function testcontainer {
           No ) break;;
       esac
   done
+  docker kill nyc-subway-sign-test
 }
 
 docker build --no-cache --tag=nyc-subway-sign .
