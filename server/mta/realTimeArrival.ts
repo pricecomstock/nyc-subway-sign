@@ -113,7 +113,7 @@ export async function syncDepartureTimesFromURL(url: string) {
           .map((stopTime: StopTimeUpdate) => {
             const station = stopTime.stopId;
             const timestamp = stopTime.departure.time.low;
-            const adt = new ArrivalDepartureTime(
+            return new ArrivalDepartureTime(
               station,
               timestamp,
               train,
@@ -121,9 +121,6 @@ export async function syncDepartureTimesFromURL(url: string) {
               routeId,
               getStationById(terminalStopId)?.stopName ?? ""
             );
-            if (/A46/.test(station))
-              console.log("🔴====> ~ file: realTimeArrival.ts ~ ", adt);
-            return adt;
           });
       }
 
