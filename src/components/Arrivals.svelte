@@ -33,18 +33,10 @@
     const arrivalMs = arrival.timestamp * 1000 - Date.now();
 
     console.log("arrivalMs", arrivalMs);
-    // console.log(
-    //   "matching hidden train direction ",
-    //   matchingHiddenTrainDirection
-    // );
-    // console.log("late enough", arrivalMs > options.soonestTrainArrival);
-    // console.log("soon enough", arrivalMs < options.latestTrainArrival);
     const keep =
       arrivalMs > options.soonestTrainArrival &&
       arrivalMs < options.latestTrainArrival &&
       !matchingHiddenTrainDirection;
-
-    // console.log(keep, "keeping", arrival);
 
     return keep;
   });

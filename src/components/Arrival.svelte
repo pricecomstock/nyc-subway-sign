@@ -23,7 +23,7 @@
     debug = !debug;
   }
 
-  console.log("Arrival", arrival.directionName);
+  console.log("Arrival", arrival);
   console.log("Station", station);
 
   let defaultStationLabel =
