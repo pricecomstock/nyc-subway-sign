@@ -5,7 +5,6 @@ function push {
 }
 
 function testcontainer {
-  docker rm nyc-subway-sign-test | xargs echo "killing"
   docker run --name nyc-subway-sign-test --env-file .env -p 5000:80 nyc-subway-sign > /dev/null &
   echo "Do you still wish to deploy? This will rebuild the container for x64"
   select yn in "Yes" "No"; do
