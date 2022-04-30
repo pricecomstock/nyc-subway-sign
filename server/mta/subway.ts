@@ -6,6 +6,7 @@ import {
 } from "./station.js";
 import { getDepartureTimes, ArrivalDepartureTime } from "./realTimeArrival.js";
 import { UPDATE_INTERVAL_MS } from "../config.js";
+import logger from "../logging/logger.js";
 
 export class Subway {
   private updateIntervalMs: number;
@@ -45,7 +46,7 @@ export class Subway {
       this.departureTimes = await getDepartureTimes();
       this.lastUpdatedMillis = Date.now();
       this.departureTimesMap = new Map<string, ArrivalDepartureTime[]>();
-      console.log(`${this.departureTimes.length} departure time updates`);
+      logger.info(`${this.departureTimes.length} departure time updates`);
 
       this.departureTimes.forEach((departureTime: ArrivalDepartureTime) => {
         const { stationDirection } = departureTime;
@@ -58,7 +59,7 @@ export class Subway {
         this.departureTimesMap.set(stationDirection, stationDepartureTimes);
       });
     } catch (error) {
-      console.error("Error syncing:", error);
+      logger.error("Error syncing:", error);
     }
   }
 
@@ -75,14 +76,14 @@ export class Subway {
   }
 
   startRealTimeUpdates(intervalMs: number) {
-    console.log(`Pulling data from MTA every ${intervalMs / 1000} seconds`);
+    logger.info(`Pulling data from MTA every ${intervalMs / 1000} seconds`);
     this.realTimeUpdateIntervalId = setInterval(() => {
       this.syncRealTimeDepartures();
     }, intervalMs);
   }
 
   pauseRealTimeUpdates() {
-    console.log(`Pausing data pull from MTA`);
+    logger.info(`Pausing data pull from MTA`);
     clearInterval(this.realTimeUpdateIntervalId);
   }
 }

@@ -2,6 +2,7 @@ import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import axios, { AxiosRequestConfig } from "axios";
 import { MTA_API_KEY } from "../config.js";
 import { getStationById } from "./station.js";
+import logger from "../logging/logger.js";
 
 if (MTA_API_KEY === "") {
   throw new Error("No MTA API Key provided");
@@ -89,11 +90,24 @@ const axiosOptions: AxiosRequestConfig = {
 };
 
 export async function syncDepartureTimesFromURL(url: string) {
-  const response = await axios.get(url, axiosOptions);
+  let response;
+  try {
+    response = await axios.get(url, axiosOptions);
+  } catch (error) {
+    logger.error(`Error loading from URL ${url}`);
+    throw error;
+  }
 
-  const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
-    response.data
-  );
+  let feed;
+
+  try {
+    feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(
+      response.data
+    );
+  } catch (error) {
+    logger.error(`Error decoding data from URL ${url}`);
+    throw error;
+  }
 
   const departureTimes: ArrivalDepartureTime[] = feed.entity
     .filter((entity: { tripUpdate?: TripUpdate }) => entity?.tripUpdate)
