@@ -96,20 +96,9 @@
 
 <main>
   <Arrivals {arrivals} station={selectedStation} />
-  {#if showTrainPicker}
-    <TrainPicker on:select={handlePickTrainEvent} />
-    {#if stations.length}
-      <Stations
-        {stations}
-        train={selectedTrain}
-        on:select={handlePickStationEvent}
-      />
-    {:else}
-      <p>Pick a train</p>
-    {/if}
-  {/if}
+
   <div class="footer">
-    <div class="station-title-and-picker">
+    <div class="station-title-and-change-btn">
       <span>
         <StationTitle
           station={selectedStation}
@@ -126,11 +115,26 @@
         >
       </span>
     </div>
+
     <p class="disclaimer">
       Due to lag time in the MTA real-time feeds, information may not be
       accurate
     </p>
   </div>
+  {#if showTrainPicker}
+    <div class="train-station-picker">
+      <TrainPicker on:select={handlePickTrainEvent} />
+      {#if stations.length}
+        <Stations
+          {stations}
+          train={selectedTrain}
+          on:select={handlePickStationEvent}
+        />
+      {:else}
+        <p>Pick a train</p>
+      {/if}
+    </div>
+  {/if}
 </main>
 
 <style>
@@ -148,7 +152,7 @@
     color: var(--mta-s);
   }
 
-  .station-title-and-picker {
+  .station-title-and-change-btn {
     display: inline-flex;
     align-items: center;
     flex: 1 0 70%;

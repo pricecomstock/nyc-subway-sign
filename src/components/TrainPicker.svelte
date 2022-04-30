@@ -4,29 +4,17 @@
 
   const dispatch = createEventDispatcher();
 
-  const trains = [
-    "A",
-    "C",
-    "E",
-    "B",
-    "D",
-    "F",
-    "M",
-    "G",
-    "J",
-    "Z",
-    "L",
-    "N",
-    "Q",
-    "R",
-    "S",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
+  const trainGroups = [
+    ["A", "C", "E"],
+    ["B", "D", "F", "M"],
+    ["G"],
+    ["J", "Z"],
+    ["L"],
+    ["N", "Q", "R"],
+    ["S"],
+    ["1", "2", "3"],
+    ["4", "5", "6"],
+    ["7"],
   ];
 
   let selected = "";
@@ -40,9 +28,13 @@
 </script>
 
 <div class="container">
-  {#each trains as train, i}
-    <div on:click={() => select(train)} class="option">
-      <TrainIcon {train} size="50px" />
+  {#each trainGroups as trainGroup}
+    <div class="train-group">
+      {#each trainGroup as train, i}
+        <div on:click={() => select(train)} class="option">
+          <TrainIcon {train} size="50px" />
+        </div>
+      {/each}
     </div>
   {/each}
 </div>
@@ -51,6 +43,11 @@
   .container {
     overflow: wrap;
     padding: 0.5rem 0;
+  }
+
+  .train-group {
+    display: inline-block;
+    padding: 0 0.5rem;
   }
 
   .option {
