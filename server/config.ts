@@ -9,3 +9,6 @@ if (UPDATE_INTERVAL_MS < 10000) {
     `Update interval of ${UPDATE_INTERVAL_MS} cannot be under 10000`
   );
 }
+
+export const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN ?? "";
+export const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID ?? "";
