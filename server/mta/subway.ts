@@ -41,32 +41,25 @@ export class Subway {
   }
 
   async syncRealTimeDepartures() {
-    this.departureTimes = await getDepartureTimes();
-    this.lastUpdatedMillis = Date.now();
-    this.departureTimesMap = new Map<string, ArrivalDepartureTime[]>();
-    console.log(`${this.departureTimes.length} departure time updates`);
+    try {
+      this.departureTimes = await getDepartureTimes();
+      this.lastUpdatedMillis = Date.now();
+      this.departureTimesMap = new Map<string, ArrivalDepartureTime[]>();
+      console.log(`${this.departureTimes.length} departure time updates`);
 
-    this.departureTimes.forEach((departureTime: ArrivalDepartureTime) => {
-      const { stationDirection } = departureTime;
+      this.departureTimes.forEach((departureTime: ArrivalDepartureTime) => {
+        const { stationDirection } = departureTime;
 
-      const stationDepartureTimes =
-        this.departureTimesMap.get(stationDirection) ?? [];
+        const stationDepartureTimes =
+          this.departureTimesMap.get(stationDirection) ?? [];
 
-      // // Check if unique before adding
-      // // Not sure if this is necessary if replacing whole array
-      // // But it's conceivable that different feeds could have same routes
-      // // when like D runs on A tracks
-      // if (
-      //   // If not any have same route id
-      //   !stationDepartureTimes.some(
-      //     (dt: ArrivalDepartureTime) => dt.routeId === departureTime.routeId
-      //   )
-      // ) {
-      stationDepartureTimes.push(departureTime);
-      // }
+        stationDepartureTimes.push(departureTime);
 
-      this.departureTimesMap.set(stationDirection, stationDepartureTimes);
-    });
+        this.departureTimesMap.set(stationDirection, stationDepartureTimes);
+      });
+    } catch (error) {
+      console.error("Error syncing:", error);
+    }
   }
 
   getDepartureTimesByStationId(id: string): ArrivalDepartureTime[] {
