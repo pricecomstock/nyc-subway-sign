@@ -8,7 +8,11 @@ const logger = winston.createLogger({
   level: "info",
   transports: [
     new winston.transports.Console({
-      format: format.combine(format.colorize(), format.simple()),
+      format: format.combine(
+        format.timestamp(),
+        format.colorize(),
+        format.simple()
+      ),
     }),
   ],
 });

@@ -1,4 +1,5 @@
 import express, { RequestHandler } from "express";
+import logger from "./logging/logger.js";
 import { Subway } from "./mta/subway.js";
 
 let subway = new Subway();
@@ -23,6 +24,8 @@ const getDepartureTimesForStation: RequestHandler<getArrivalTimesParams> = (
   _next
 ) => {
   const station = req.params.station.toUpperCase();
+  logger.info(`Departure Times Requested for ${station}`);
+
   const arrivals = subway.getDepartureTimesByStationId(station);
   const stationInfo = subway.getStationById(station);
   const lastUpdated = subway.lastUpdatedMillis;
