@@ -19,14 +19,10 @@
   }
 
   function toggleDebug() {
-    console.log("Toggle Debug");
     debug = !debug;
   }
 
-  console.log("Arrival", arrival);
-  console.log("Station", station);
-
-  let defaultStationLabel =
+  const defaultStationLabel =
     arrival.direction === "N"
       ? station.northDirectionLabel || "End of line"
       : station.southDirectionLabel || "End of line";

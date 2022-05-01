@@ -3,13 +3,7 @@
   import { DisplayOptions } from "../DisplaySpec";
   export let arrivals = [];
   export let station = {};
-  export let options = {
-    maxArrivals: 10,
-    maxArrivalsPerTrainDirection: 3,
-    hiddenTrainDirections: [],
-    soonestTrainArrival: -60000,
-    latestTrainArrival: 3600000,
-  };
+  export let options = new DisplayOptions();
 
   function stationHasDirection(direction) {
     return direction === "N"
@@ -18,10 +12,12 @@
   }
 
   $: trains = [...new Set(arrivals.map(({ train }) => train))];
+
   $: trainDirections = trains.flatMap((train) => [
     { train, direction: "S" },
     { train, direction: "N" },
   ]);
+
   $: filteredArrivals = arrivals.filter((arrival) => {
     const matchingHiddenTrainDirection = options.hiddenTrainDirections.some(
       (trainDirection) => {
@@ -33,18 +29,20 @@
     );
     const arrivalMs = arrival.timestamp * 1000 - Date.now();
 
-    console.log("arrivalMs", arrivalMs);
+    console.log(
+      "comparing",
+      arrivalMs,
+      options.soonestTrainArrivalMinutes * 60000
+    );
     const keep =
-      arrivalMs > options.soonestTrainArrival &&
-      arrivalMs < options.latestTrainArrival &&
+      arrivalMs > options.soonestTrainArrivalMinutes * 60000 &&
+      arrivalMs < options.latestTrainArrivalMinutes * 60000 &&
       !matchingHiddenTrainDirection;
-
     return keep;
   });
-  // Map {train, direction} ==> Arrival[]
+
   $: arrivalsByTrainDirections = new Map(
     trainDirections.map((trainDirection) => {
-      console.log("trainDirection", trainDirection);
       return [
         trainDirection,
         filteredArrivals
@@ -54,38 +52,17 @@
               arrival.train === trainDirection.train
             );
           })
-          .slice(0, options.maxArrivalsPerTrainDirection), // Limit to 2 for each train direction
+          .slice(0, options.maxArrivalsPerTrainDirection),
       ];
     })
   );
 
-  $: console.log("arrivals", arrivals);
-  $: console.log("filtered", filteredArrivals);
-  $: console.log("ABTD", arrivalsByTrainDirections);
-  // $: arrivalsByTrain = [...trainDirections].map((trainDirection) => {
-  //   return arrivals.filter((arrival) => arrival.train === train);
-  // });
-  // $: arrivalsByTrainByDirection = arrivalsByTrain.map((arrivalList) => {
-  //   return arrivalList
-  // })
-  // $: relevantArrivals = arrivals
+  // $: console.log("arrivals", arrivals);
   $: relevantArrivals = [...arrivalsByTrainDirections.values()]
     .flat()
     .filter((arrival) => stationHasDirection(arrival.direction))
     .sort((a, b) => a.timestamp - b.timestamp)
     .slice(0, options.maxArrivals);
-  // $: relevantArrivals =
-  // [...trains].map((train) => {
-  //   return arrivals
-  //   // get arrivals for train
-  //   .filter((arrival) => arrival.train === train)
-  //   // Get first 2 arrivals in each direction for train
-  //   .flatMap(arrival => [
-  //   ...arrivals.filter(({direction}) => direction === "S").slice(0,2),
-  //   ...arrivals.filter(({direction}) => direction === "N").slice(0,2)
-  // ]
-  // })
-  // .sort((a, b) => a.timestamp - b.timestamp)
 </script>
 
 <div>
@@ -95,13 +72,7 @@
     </div>
   {/each}
 </div>
-<!-- {#each [...arrivalsByTrainDirections.values()] as abt}
-  {JSON.stringify(abt)}
-{/each} -->
 
-<!-- {#each relevantArrivals as rArrival}
-   <p>{rArrival.stationDirection} - {rArrival.train}: {(rArrival.timestamp - Date.now()/1000).toFixed()}</p>
-{/each} -->
 <style>
   /* your styles go here */
   .arrival-container {

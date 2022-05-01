@@ -3,17 +3,11 @@
   import Stations from "./components/Stations.svelte";
   import Arrivals from "./components/Arrivals.svelte";
   import StationTitle from "./components/StationTitle.svelte";
-  import { DisplaySpec, DisplayOptions } from "./DisplaySpec";
+  import OptionsEditor from "./components/OptionsEditor.svelte";
+  import { DisplayOptions } from "./DisplaySpec";
   import { onMount } from "svelte";
-  import { writable } from "svelte/store";
-
-  const toDisplay = writable<DisplaySpec[]>([]);
 
   let displayOptions: DisplayOptions;
-  const unsubscribe = toDisplay.subscribe((value) => {
-    // TODO actually handle array
-    displayOptions = value[0].options;
-  });
 
   let selectedTrain = "";
   let selectedStation = {};
@@ -33,7 +27,7 @@
 
   function writeUrlParams() {
     const url = new URL(parent.location.toString());
-    url.search = displayOptions.toURLParams().toString();
+    url.searchParams.set("options", displayOptions.toBase64());
     url.searchParams.set("station", selectedStation.gtfsStopId);
 
     window.history.replaceState(
@@ -45,14 +39,18 @@
 
   async function loadFromUrlParams() {
     const query = new URLSearchParams(parent.location.search);
-    const options = DisplayOptions.fromURLParams(query);
+
+    const optionsBase64 = query.get("options") || undefined;
+    displayOptions = optionsBase64
+      ? DisplayOptions.fromBase64(optionsBase64)
+      : new DisplayOptions();
+
     const queryStation = query.get("station");
     if (queryStation) {
       showTrainPicker = false;
+
       const station = await getStationById(queryStation);
       selectedStation = station;
-      // TODO switch this to station object instead of string
-      toDisplay.set([new DisplaySpec(selectedStation.gtfsStopId, options)]);
       await initializeForSelectedStation();
     } else {
       showTrainPicker = true;
@@ -109,7 +107,7 @@
 </script>
 
 <main>
-  <Arrivals {arrivals} station={selectedStation} />
+  <Arrivals {arrivals} station={selectedStation} options={displayOptions} />
 
   <div class="footer">
     <div class="station-title-and-change-btn">
@@ -149,6 +147,9 @@
       {/if}
     </div>
   {/if}
+  <div>
+    <OptionsEditor options={displayOptions} />
+  </div>
 </main>
 
 <style>

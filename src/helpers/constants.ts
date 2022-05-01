@@ -1,8 +1,8 @@
 export const QUERY_PARAMS = {
   STATION: "station",
-  MAX_ARRIVALS: "maxarrivals",
-  MAX_ARRIVALS_PER_TRAIN_DIRECTION: "maxarrivalspertrain",
+  MAX_ARRIVALS: "maxArrivals",
+  MAX_ARRIVALS_PER_TRAIN_DIRECTION: "maxArrivalsPerTrain",
   HIDDEN_TRAIN_DIRECTIONS: "hide",
-  SOONEST_ARRIVAL_MS: "soonest",
-  LATEST_ARRIVAL_MS: "latest",
+  SOONEST_MINUTES: "soonestMinutes",
+  LATEST_MINUTES: "latestMinutes",
 };
