@@ -24,9 +24,10 @@ if (
 ) {
   logger.add(
     new TelegramTransport({
-      level: "warn",
+      level: "error",
       token: TELEGRAM_TOKEN,
       chatId: TELEGRAM_CHAT_ID,
+      format: format.combine(format.timestamp(), format.simple()),
     })
   );
 }

@@ -59,7 +59,10 @@ export class Subway {
         this.departureTimesMap.set(stationDirection, stationDepartureTimes);
       });
     } catch (error) {
-      logger.error("Error syncing:", error);
+      logger.warn("Error syncing realtime data:", error);
+      if (Date.now() - this.lastUpdatedMillis > 300_000) {
+        logger.error("No updates received from MTA in 5 minutes");
+      }
     }
   }
 

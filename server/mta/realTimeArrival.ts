@@ -94,7 +94,7 @@ export async function syncDepartureTimesFromURL(url: string) {
   try {
     response = await axios.get(url, axiosOptions);
   } catch (error) {
-    logger.error(`Error loading from URL ${url}`);
+    logger.warn(`Cannot load from URL ${url}`);
     throw error;
   }
 
@@ -105,7 +105,7 @@ export async function syncDepartureTimesFromURL(url: string) {
       response.data
     );
   } catch (error) {
-    logger.error(`Error decoding data from URL ${url}`);
+    logger.warn(`Cannot decode data from URL ${url}`);
     throw error;
   }
 

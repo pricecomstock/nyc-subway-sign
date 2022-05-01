@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import path from "path";
 import cors from "cors";
 import { api } from "./router.js";
+import logger from "./logging/logger.js";
 
 const { json } = bodyParser;
 
@@ -31,3 +32,4 @@ app.get("/*", (_req, res) => {
 const port = process.env.PORT || 3000;
 
 app.listen(port);
+logger.info(`Listing on port ${port}`);
