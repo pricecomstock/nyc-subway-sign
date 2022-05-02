@@ -28,12 +28,6 @@
       }
     );
     const arrivalMs = arrival.timestamp * 1000 - Date.now();
-
-    console.log(
-      "comparing",
-      arrivalMs,
-      options.soonestTrainArrivalMinutes * 60000
-    );
     const keep =
       arrivalMs > options.soonestTrainArrivalMinutes * 60000 &&
       arrivalMs < options.latestTrainArrivalMinutes * 60000 &&

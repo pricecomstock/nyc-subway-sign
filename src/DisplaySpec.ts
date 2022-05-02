@@ -1,3 +1,4 @@
+import type { Station } from "../server/mta/station";
 import { QUERY_PARAMS } from "./helpers/constants";
 
 export class DisplayOptions {
@@ -26,7 +27,6 @@ export class DisplayOptions {
 
   static fromJSON(json) {
     const opts = JSON.parse(json);
-    console.log("🔴====> ~ file: DisplaySpec.ts ~ line 28 ~ opts", opts);
     const {
       maxArrivals,
       maxArrivalsPerTrainDirection,
@@ -68,8 +68,43 @@ export class DisplayOptions {
   }
 }
 
-export class DisplaySpec {
-  constructor(public station: string, public options?: DisplayOptions) {
-    this.options = options ?? new DisplayOptions();
+export class DisplayStation {
+  /**
+   * The Station to display
+   */
+  public station: Station;
+
+  /**
+   * Options that apply only to this station
+   */
+  public options: DisplayOptions;
+}
+
+export class AppState {
+  public displays: DisplayStation[];
+
+  public globalOptions: object;
+
+  // public changeListeners: [];
+
+  constructor(displays: DisplayStation[] = [], globalOptions: object = {}) {
+    this.displays = displays;
+    this.globalOptions = globalOptions;
+  }
+
+  // addChangeListener(fn: Function) {}
+
+  // markChanged() {}
+
+  addDisplayStation(displayStation: DisplayStation) {
+    this.displays.push(displayStation);
+  }
+
+  overwriteDisplayStation(index: number, displayStation: DisplayStation) {
+    this.displays.splice(index, 1, displayStation);
+  }
+
+  removeDisplayStation(index: number) {
+    this.displays.splice(index, 1);
   }
 }
