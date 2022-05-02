@@ -3,7 +3,7 @@
   export let station = {};
 </script>
 
-{#if station.stopName}
+{#if station?.stopName}
   <div class="station-title">
     {#each station.trains as train}
       <span><TrainIcon {train} size="2rem" /></span>

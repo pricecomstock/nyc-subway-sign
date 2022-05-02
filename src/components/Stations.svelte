@@ -1,25 +1,38 @@
 <script lang="typescript">
-  import { getTrainColorFGClass } from "../helpers/color"
-	import TrainIcon from "./TrainIcon.svelte"
-  
-  import {createEventDispatcher} from "svelte";
+  import { getTrainColorFGClass } from "../helpers/color";
+  import TrainIcon from "./TrainIcon.svelte";
+
+  import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
 
   export let train = "";
-  export let stations = []
+  export let stations = [];
 
   let selectedIndex = -1;
 
   $: selectedStation = stations[selectedIndex];
-  $: trainColorClass = getTrainColorFGClass(train)
+  $: trainColorClass = getTrainColorFGClass(train);
 
   function selectIndex(index: number) {
     selectedIndex = index;
-    dispatch("select", {
-      station: stations[selectedIndex]
-    })
+    dispatch("select", stations[selectedIndex]);
   }
 </script>
+
+<div>
+  {#if stations}
+    <h1>
+      <span class="icon"><TrainIcon {train} size="50px" /></span> Stations
+    </h1>
+    <ul class="stations-list">
+      {#each stations as station, i}
+        <li on:click={() => selectIndex(i)} class={`${trainColorClass}`}>
+          {station.stopName}
+        </li>
+      {/each}
+    </ul>
+  {/if}
+</div>
 
 <style>
   .icon {
@@ -35,7 +48,7 @@
     max-width: 30ch;
     margin: auto;
   }
-	.stations-list {
+  .stations-list {
     text-align: left;
   }
   li {
@@ -46,19 +59,3 @@
     color: black !important;
   }
 </style>
-
-  
-<div>
-  {#if stations}
-  <h1>
-    <span class="icon"><TrainIcon {train} size="50px"></TrainIcon></span> Stations
-  </h1>
-  <ul class="stations-list">
-    {#each stations as station, i}
-    <li on:click={() => selectIndex(i)} class={`${trainColorClass}`}>
-      {station.stopName}
-    </li>
-    {/each}
-  </ul>
-  {/if}
-</div>

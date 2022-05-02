@@ -6,11 +6,12 @@
   import OptionsEditor from "./components/OptionsEditor.svelte";
   import { DisplayOptions } from "./DisplaySpec";
   import { onMount } from "svelte";
+  import type { Station } from "../server/mta/station";
 
   let displayOptions: DisplayOptions;
 
   let selectedTrain = "";
-  let selectedStation = {};
+  let selectedStation: Station = undefined;
   let stations = [];
   let arrivals = [];
   let showTrainPicker = false;
@@ -63,13 +64,15 @@
     stations = data.stations;
   }
 
-  async function getStationById(gtfsId: string) {
+  async function getStationById(gtfsId: string): Promise<Station> {
     const response = await fetch(`${baseUrl}/api/station/${gtfsId}`);
     const data = await response.json();
-    return data.station;
+    return data.station as Station;
   }
 
-  async function getArrivalsForStation(station) {
+  async function getArrivalsForStation(station: Station) {
+    console.log("🔴====> ~ file: App.svelte ~ line 74 ~ station", station);
+    if (!station) return [];
     const { gtfsStopId } = station;
     const response = await fetch(`${baseUrl}/api/departures/${gtfsStopId}`);
     const data = await response.json();
@@ -82,8 +85,7 @@
   }
 
   function handlePickStationEvent(event) {
-    selectedStation = (event as CustomEvent<{ station: string }>).detail
-      .station;
+    selectedStation = (event as CustomEvent<Station>).detail;
     writeUrlParams();
     initializeForSelectedStation();
     showTrainPicker = false;
