@@ -30,6 +30,7 @@
       : station.southDirectionLabel || "End of line";
 
   $: arrivalTimestamp = arrival.timestamp * 1000;
+  $: arrivalTimeHHMMSS = new Date(arrivalTimestamp).toLocaleTimeString("en-us");
   $: directionLabel = arrival.directionName || defaultStationLabel;
   $: msRemaining = arrivalTimestamp - currentMs;
   $: minutesRemaining = displayMinutesFromMs(msRemaining);
@@ -39,17 +40,22 @@
 {#if arrival.timestamp && station.gtfsStopId}
   <div class="arrival" class:arriving={isArrivingSoon} on:click={toggleDebug}>
     <!-- <div class="train-icon"> -->
-    <TrainIcon train={arrival.train} size="min(12vmin, 1.8em)" />
+    <TrainIcon train={arrival.train} size="min(5.5vmax, 8rem)" />
     <!-- </div> -->
     <div class="direction-label">{directionLabel}</div>
-    <div class="eta">{minutesRemaining} min</div>
     {#if debug}
-      <div class="debug">
-        {new Date(arrivalTimestamp).toLocaleTimeString("en-US")}
-        <br />
-        in {(msRemaining / 1000).toFixed(0)} sec
-        <br />
-        <!-- {arrival.tripId} -->
+      <div class="eta">
+        <div class="debug">
+          <span class="debug-bold">{minutesRemaining} min</span> ({(
+            msRemaining / 1000
+          ).toFixed(0)}s)
+          <br />
+          {arrivalTimeHHMMSS}
+        </div>
+      </div>
+    {:else}
+      <div class="eta">
+        {minutesRemaining} min
       </div>
     {/if}
   </div>
@@ -69,12 +75,20 @@
     align-self: baseline;
   }
 
+  .small-eta {
+  }
+
   .direction-label {
     flex: 1 0;
     text-align: left;
     padding-left: 2vw;
     /* overflow: hidden;
     white-space: nowrap; */
+  }
+
+  .debug-bold {
+    font-weight: bold;
+    color: #333;
   }
 
   .eta {
@@ -85,7 +99,8 @@
   .debug {
     font-size: 0.5em;
     margin-left: 0.3rem;
-    text-align: left;
+    font-weight: normal;
+    color: #888;
   }
 
   @keyframes arrivingFlash {
