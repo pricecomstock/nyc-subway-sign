@@ -40,6 +40,8 @@
       const station = await getStationById(queryStation);
       selectedStation = station;
       await initializeForSelectedStation();
+      setPageTitleForStations();
+      setIconToTrain(selectedStation.trains[0]);
     } else {
       showTrainPicker = true;
     }
@@ -66,6 +68,7 @@
 
   function handlePickTrainEvent(event) {
     selectedTrain = (event as CustomEvent<{ train: string }>).detail.train;
+    setIconToTrain(selectedTrain);
     getStationsForTrain(selectedTrain);
   }
 
@@ -74,7 +77,23 @@
       .station;
     writeUrlParams();
     initializeForSelectedStation();
+    setPageTitleForStations();
     showTrainPicker = false;
+  }
+
+  function setPageTitleForStations() {
+    document.title = `${selectedStation.stopName} - whentrain.nyc`;
+  }
+
+  function setIconToTrain(train) {
+    let faviconLink = document.querySelector("link[rel~='icon']");
+    if (!faviconLink) {
+      faviconLink = document.createElement("link");
+      faviconLink.rel = "icon";
+      document.getElementsByTagName("head")[0].appendChild(faviconLink);
+    }
+
+    faviconLink.href = `/img/subway-icons/${train.toLowerCase()}.svg`;
   }
 
   async function initializeForSelectedStation() {
@@ -151,7 +170,7 @@
     align-items: center;
     flex: 1 0 70%;
     align-self: left;
-    padding: max(0.5rem, 1vh) 0;
+    padding: max(0.5rem, 2vh) 0;
   }
 
   .disclaimer {

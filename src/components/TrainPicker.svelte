@@ -32,7 +32,7 @@
     <div class="train-group">
       {#each trainGroup as train, i}
         <div on:click={() => select(train)} class="option">
-          <TrainIcon {train} size="50px" />
+          <TrainIcon {train} size="max(6vmin, 3rem)" />
         </div>
       {/each}
     </div>

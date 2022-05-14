@@ -6,7 +6,7 @@
 {#if station.stopName}
   <div class="station-title">
     {#each station.trains as train}
-      <span><TrainIcon {train} size="4vmin" /></span>
+      <span><TrainIcon {train} size="max(4vmin, 1.3rem)" /></span>
     {/each}
     <h1>{station.stopName}</h1>
   </div>
@@ -24,6 +24,6 @@
   }
   .station-title h1 {
     font-size: max(1em, 3vmin);
-    margin: 0 0.5rem;
+    margin: 0 1vw;
   }
 </style>
