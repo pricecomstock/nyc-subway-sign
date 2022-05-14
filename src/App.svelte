@@ -97,25 +97,24 @@
 <main>
   <Arrivals {arrivals} station={selectedStation} />
 
+  <div class="station-title-and-change-btn">
+    <span>
+      <StationTitle
+        station={selectedStation}
+        on:pickNewStation={() => {
+          showTrainPicker = true;
+        }}
+      />
+    </span>
+    <span>
+      <button
+        on:click={() => {
+          showTrainPicker = !showTrainPicker;
+        }}>change</button
+      >
+    </span>
+  </div>
   <div class="footer">
-    <div class="station-title-and-change-btn">
-      <span>
-        <StationTitle
-          station={selectedStation}
-          on:pickNewStation={() => {
-            showTrainPicker = true;
-          }}
-        />
-      </span>
-      <span>
-        <button
-          on:click={() => {
-            showTrainPicker = !showTrainPicker;
-          }}>change</button
-        >
-      </span>
-    </div>
-
     <p class="disclaimer">
       Due to lag time in the MTA real-time feeds, information may not be
       accurate
@@ -147,28 +146,26 @@
     margin: 0 auto;
   }
 
-  .disclaimer {
-    font-size: 0.75rem;
-    color: var(--mta-s);
-  }
-
   .station-title-and-change-btn {
     display: inline-flex;
     align-items: center;
     flex: 1 0 70%;
     align-self: left;
+    padding: max(0.5rem, 1vh) 0;
   }
 
   .disclaimer {
-    flex: 0 1 30%;
-    align-self: right;
+    align-self: center;
+    flex-shrink: 1;
+    font-size: 0.75rem;
+    color: var(--mta-s);
+    margin: auto;
   }
 
   .footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 0;
   }
 
   button {
