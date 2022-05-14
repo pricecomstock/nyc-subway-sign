@@ -23,7 +23,7 @@
     margin: 0 0.1rem;
   }
   .station-title h1 {
-    font-size: max(1em, 3vmin);
+    font-size: max(1.25em, 3vmin);
     margin: 0 1vw;
   }
 </style>

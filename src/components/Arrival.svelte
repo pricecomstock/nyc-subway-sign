@@ -61,7 +61,7 @@
     align-items: center;
     justify-content: stretch;
     font-weight: bold;
-    font-size: max(3vw, 1.3em);
+    font-size: max(3vw, 1.5em);
   }
 
   .train-icon {
