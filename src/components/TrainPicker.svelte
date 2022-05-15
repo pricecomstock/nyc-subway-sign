@@ -10,7 +10,7 @@
     ["G"],
     ["J", "Z"],
     ["L"],
-    ["N", "Q", "R"],
+    ["N", "Q", "R", "W"],
     ["S"],
     ["1", "2", "3"],
     ["4", "5", "6"],
@@ -32,7 +32,7 @@
     <div class="train-group">
       {#each trainGroup as train, i}
         <div on:click={() => select(train)} class="option">
-          <TrainIcon {train} size="50px" />
+          <TrainIcon {train} size="max(6vmin, 3rem)" />
         </div>
       {/each}
     </div>

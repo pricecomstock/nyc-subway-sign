@@ -71,6 +71,6 @@
   /* your styles go here */
   .arrival-container {
     border-bottom: #888 2px solid;
-    padding: 8px 0;
+    padding: max(4px, 1.25vmin) 0;
   }
 </style>

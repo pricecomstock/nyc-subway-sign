@@ -1,3 +1,7 @@
+function reloadprod {
+  ssh root@pccloud 'cd ~/nyc-subway-sign ; docker-compose pull ; docker-compose down ; docker-compose up -d'
+}
+
 function push {
   docker build --platform linux/amd64 --no-cache --tag=nyc-subway-sign . 
   docker tag nyc-subway-sign pricecomstock/nyc-subway-sign
@@ -29,5 +33,13 @@ select next in "Test" "Push" "Nothing"; do
     Test ) testcontainer; break;;
     Push ) push; break;;
     Nothing ) break;;
+  esac
+done
+
+echo "Refresh prod?"
+select next in "Refresh" "No"; do
+  case $next in
+    Refresh ) reloadprod; break;;
+    No ) break;;
   esac
 done

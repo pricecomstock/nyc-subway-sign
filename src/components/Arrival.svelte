@@ -8,8 +8,6 @@
   let currentMs = Date.now();
   const arrivingThresholdMs = -20000;
 
-  let fontSizeRem = 1.8;
-
   setInterval(() => {
     currentMs = Date.now();
   }, 5000);
@@ -28,6 +26,7 @@
       : station.southDirectionLabel || "End of line";
 
   $: arrivalTimestamp = arrival.timestamp * 1000;
+  $: arrivalTimeHHMMSS = new Date(arrivalTimestamp).toLocaleTimeString("en-us");
   $: directionLabel = arrival.directionName || defaultStationLabel;
   $: msRemaining = arrivalTimestamp - currentMs;
   $: minutesRemaining = displayMinutesFromMs(msRemaining);
@@ -35,25 +34,24 @@
 </script>
 
 {#if arrival.timestamp && station.gtfsStopId}
-  <div
-    class="arrival"
-    style={`font-size:${fontSizeRem}rem`}
-    class:arriving={isArrivingSoon}
-    on:click={toggleDebug}
-  >
+  <div class="arrival" class:arriving={isArrivingSoon} on:click={toggleDebug}>
     <!-- <div class="train-icon"> -->
-    <TrainIcon train={arrival.train} size="2em" />
+    <TrainIcon train={arrival.train} size="min(5.5vmax, 8rem)" />
     <!-- </div> -->
     <div class="direction-label">{directionLabel}</div>
-    <div class="eta">{minutesRemaining} min</div>
     {#if debug}
-      <div class="debug">
-        {new Date(arrivalTimestamp).toLocaleTimeString("en-US")}
-        <br />
-        sec:
-        {(msRemaining / 1000).toFixed(0)}
-        <br />
-        {arrival.tripId}
+      <div class="eta">
+        <div class="debug">
+          <span class="debug-bold">{minutesRemaining} min</span> ({(
+            msRemaining / 1000
+          ).toFixed(0)}s)
+          <br />
+          {arrivalTimeHHMMSS}
+        </div>
+      </div>
+    {:else}
+      <div class="eta">
+        {minutesRemaining} min
       </div>
     {/if}
   </div>
@@ -65,6 +63,7 @@
     align-items: center;
     justify-content: stretch;
     font-weight: bold;
+    font-size: max(3vw, 1.5em);
   }
 
   .train-icon {
@@ -72,10 +71,20 @@
     align-self: baseline;
   }
 
+  .small-eta {
+  }
+
   .direction-label {
     flex: 1 0;
     text-align: left;
-    padding-left: 1rem;
+    padding-left: 2vw;
+    /* overflow: hidden;
+    white-space: nowrap; */
+  }
+
+  .debug-bold {
+    font-weight: bold;
+    color: #333;
   }
 
   .eta {
@@ -86,7 +95,8 @@
   .debug {
     font-size: 0.5em;
     margin-left: 0.3rem;
-    text-align: left;
+    font-weight: normal;
+    color: #888;
   }
 
   @keyframes arrivingFlash {
