@@ -23,7 +23,7 @@
 
   function writeUrlParams() {
     const url = new URL(parent.location.toString());
-    url.searchParams.set("station", selectedStation.gtfsStopId);
+    url.searchParams.set("s", selectedStation.gtfsStopId);
 
     window.history.replaceState(
       { page: 1 },
@@ -34,7 +34,7 @@
 
   async function loadFromUrlParams() {
     const query = new URLSearchParams(parent.location.search);
-    const queryStation = query.get("station");
+    const queryStation = query.get("s") || query.get("station"); // idk if anyone bookmarked it before 5/17/22
     if (queryStation) {
       showTrainPicker = false;
       const station = await getStationById(queryStation);
