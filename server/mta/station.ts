@@ -62,21 +62,24 @@ export class Station {
 }
 
 export async function fetchStations(): Promise<Station[]> {
-  const stationCsv = await fetchStationCSV();
-  const stations = parse(stationCsv, { columns: true });
+  const stations = await fetchAndParseStationCSV();
   return stations.map((station: stationCSVRecord) => new Station(station));
 }
 
-export async function fetchStationCSV(): Promise<string> {
+export async function fetchAndParseStationCSV(): Promise<stationCSVRecord[]> {
   try {
-    return await fetchStationCSVFromMTA();
-  } catch {
-    return fetchStationCSVLocally();
+    const stationCsv = await fetchStationCSVFromMTA();
+    return parse(stationCsv, { columns: true });
+  } catch (error) {
+    const stationCsv = fetchStationCSVLocally();
+    return parse(stationCsv, { columns: true });
   }
 }
 
 async function fetchStationCSVFromMTA(): Promise<string> {
-  const response = await axios.get<string>(MTA_STATION_CSV_URL);
+  const response = await axios.get<string>(MTA_STATION_CSV_URL, {
+    timeout: 5000,
+  });
   return response.data;
 }
 
