@@ -11,6 +11,7 @@
   let arrivals = [];
   let showTrainPicker = false;
 
+  let identifier;
   let intervalId;
 
   const baseUrl = __IS_DEVELOPMENT__
@@ -19,6 +20,7 @@
 
   onMount(async () => {
     await loadFromUrlParams();
+    identifier = await getIdentifier();
   });
 
   function writeUrlParams() {
@@ -61,9 +63,33 @@
 
   async function getArrivalsForStation(station) {
     const { gtfsStopId } = station;
-    const response = await fetch(`${baseUrl}/api/departures/${gtfsStopId}`);
+    const response = await fetch(`${baseUrl}/api/departures/${gtfsStopId}`, {
+      headers: { identifier },
+    });
     const data = await response.json();
     arrivals = data.arrivals;
+  }
+
+  async function getIdentifier() {
+    const existingIdentifier = localStorage.getItem("identifier");
+    if (existingIdentifier) {
+      return existingIdentifier;
+    }
+
+    const response = await fetch(`${baseUrl}/api/identifier`, {
+      method: "POST",
+      body: JSON.stringify({
+        referrer: document.referrer,
+        details: {
+          height: document.body.clientHeight,
+          width: document.body.clientWidth,
+        },
+      }),
+    });
+
+    const { identifier = "" } = await response.json();
+    localStorage.setItem("identifier", identifier);
+    return identifier;
   }
 
   function handlePickTrainEvent(event) {
