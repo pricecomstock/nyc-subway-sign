@@ -1,4 +1,5 @@
 import express, { RequestHandler } from "express";
+import { Identifier } from "./db/sequelizeInstance.js";
 import logger from "./logging/logger.js";
 import { Subway } from "./mta/subway.js";
 
@@ -80,3 +81,43 @@ const getStationByGtfsId: RequestHandler<getStationByGtfsIdParams> = (
   });
 };
 api.get("/station/:gtfsId", getStationByGtfsId);
+
+/*=============================
+POST ID
+=============================*/
+interface createIdBody {
+  referrer: string;
+
+  /** An object with misc details that we can save. */
+  details: {
+    height: number;
+    width: number;
+  };
+}
+
+interface createIdResponse {
+  identifier: string;
+}
+
+const getId: RequestHandler<any, createIdResponse, createIdBody> = async (
+  req,
+  res,
+  _next
+) => {
+  const { referrer, details: { height = null, width = null } = {} } = req.body;
+  try {
+    const identifier = await Identifier.create({
+      referrer: referrer.slice(0, 255),
+      height,
+      width,
+      originalIp: req.ip,
+      userAgent: req.header("User-Agent")?.slice(0, 255),
+    });
+    console.log("record", identifier.toJSON());
+    res.send({ identifier: identifier.id });
+  } catch (err) {
+    console.log(err);
+    res.status(406).send(err);
+  }
+};
+api.post("/identifier", getId);
