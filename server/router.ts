@@ -25,7 +25,11 @@ const getDepartureTimesForStation: RequestHandler<getArrivalTimesParams> = (
   _next
 ) => {
   const station = req.params.station.toUpperCase();
-  logger.info(`Departure Times Requested for ${station}`);
+  const identifier = req.header("identifier");
+  logger.info(`Departure Times Requested for ${station} by ${identifier}`, {
+    station,
+    identifier,
+  });
 
   const arrivals = subway.getDepartureTimesByStationId(station);
   const stationInfo = subway.getStationById(station);
@@ -104,10 +108,11 @@ const getId: RequestHandler<any, createIdResponse, createIdBody> = async (
   res,
   _next
 ) => {
-  const { referrer, details: { height = null, width = null } = {} } = req.body;
+  const { referrer = "", details: { height = null, width = null } = {} } =
+    req.body;
   try {
     const identifier = await Identifier.create({
-      referrer: referrer.slice(0, 255),
+      referrer: referrer?.slice(0, 255),
       height,
       width,
       originalIp: req.ip,
