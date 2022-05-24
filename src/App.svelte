@@ -4,6 +4,7 @@
   import Arrivals from "./components/Arrivals.svelte";
   import StationTitle from "./components/StationTitle.svelte";
   import { onMount } from "svelte";
+  import Modal from "./components/Modal.svelte";
 
   let selectedTrain = "";
   let selectedStation = {};
@@ -166,18 +167,20 @@
     </p>
   </div>
   {#if showTrainPicker}
-    <div class="train-station-picker">
-      <TrainPicker on:select={handlePickTrainEvent} />
-      {#if stations.length}
-        <Stations
-          {stations}
-          train={selectedTrain}
-          on:select={handlePickStationEvent}
-        />
-      {:else}
-        <p>Pick a train</p>
-      {/if}
-    </div>
+    <Modal show={showTrainPicker}>
+      <div class="train-station-picker">
+        <TrainPicker on:select={handlePickTrainEvent} />
+        {#if stations.length}
+          <Stations
+            {stations}
+            train={selectedTrain}
+            on:select={handlePickStationEvent}
+          />
+        {:else}
+          <p>Pick a train</p>
+        {/if}
+      </div>
+    </Modal>
   {/if}
 </main>
 
