@@ -9,6 +9,7 @@
   --mta-123: #ee352e;
   --mta-456: #00933c;
   --mta-7: #b933ad;
+  --black: #333;
 }
 
 @font-face {
@@ -31,7 +32,7 @@ body {
 }
 
 body {
-  color: #333;
+  color: var(--black);
   margin: 0;
   padding: 8px;
   box-sizing: border-box;
