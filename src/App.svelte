@@ -4,12 +4,14 @@
   import Arrivals from "./components/Arrivals.svelte";
   import StationTitle from "./components/StationTitle.svelte";
   import { onMount } from "svelte";
+  import { calculateDistance } from "./helpers/utils";
 
   let selectedTrain = "";
   let selectedStation = {};
   let stations = [];
   let arrivals = [];
   let showTrainPicker = false;
+  let showNearby = false;
 
   let identifier;
   let intervalId;
@@ -137,6 +139,42 @@
     if (intervalId) clearInterval(intervalId);
     intervalId = setInterval(updateArrivalTimes, ms);
   }
+
+  function getNearby() {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const response = await fetch(`${baseUrl}/api/stations`);
+        const json = await response.json();
+        const { stations: allStations = [] } = json;
+        const { latitude, longitude } = position.coords;
+        const distanceThreshold = 0.01; // 0.015 is just over a mile of latitude, roughly, less longitude
+        const closeStations = [];
+        allStations.forEach((station) => {
+          const distance = calculateDistance(
+            latitude,
+            longitude,
+            station.gtfsLatitude,
+            station.gtfsLongitude
+          );
+          if (distance < distanceThreshold) {
+            closeStations.push({ ...station, distance: distance });
+          }
+        });
+        closeStations.sort((a, b) => a.distance - b.distance);
+        console.log(
+          closeStations.map((s) => ({
+            name: s.stopName,
+            trains: s.trains,
+            id: s.gtfsStopId,
+            distande: s.distance,
+          }))
+        );
+      },
+      () => {
+        console.log("can't get location");
+      }
+    );
+  }
 </script>
 
 <main>
@@ -157,6 +195,7 @@
           showTrainPicker = !showTrainPicker;
         }}>change</button
       >
+      <button on:click={getNearby}>nearby</button>
     </span>
   </div>
   <div class="footer">
