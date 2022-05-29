@@ -247,7 +247,7 @@
     </p>
   </div>
   {#if nearbyState === NEARBY_STATES.LOADING}
-    <p>Loading nearby...</p>
+    <p>loading nearby stations...</p>
   {:else if nearbyState === NEARBY_STATES.LOADED}
     <div class="nearby-station-picker">
       <h2>Nearby Stations</h2>
