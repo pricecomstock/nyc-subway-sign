@@ -1,18 +1,20 @@
 <script lang="ts">
   import TrainPicker from "./components/TrainPicker.svelte";
-  import Stations from "./components/StationPicker.svelte";
   import Arrivals from "./components/Arrivals.svelte";
   import StationTitle from "./components/StationTitle.svelte";
   import { onMount } from "svelte";
   import { calculateDistance } from "./helpers/utils";
   import StationPicker from "./components/StationPicker.svelte";
+  import StationList from "./components/StationList.svelte";
 
   let selectedTrain = "";
   let selectedStation = {};
   let stations = [];
   let arrivals = [];
-  let showTrainPicker = false;
-  let showNearby = false;
+  let isShowingTrainPicker = false;
+  let isShowingNearby = false;
+  let isLoadingNearby = false;
+  let nearbyStations = [];
 
   let identifier;
   let intervalId;
@@ -41,14 +43,14 @@
     const query = new URLSearchParams(parent.location.search);
     const queryStation = query.get("s") || query.get("station"); // idk if anyone bookmarked it before 5/17/22
     if (queryStation) {
-      showTrainPicker = false;
+      isShowingTrainPicker = false;
       const station = await getStationById(queryStation);
       selectedStation = station;
       await initializeForSelectedStation();
       setPageTitleForStations();
       setIconToTrain(selectedStation.trains[0]);
     } else {
-      showTrainPicker = true;
+      isShowingTrainPicker = true;
     }
   }
 
@@ -107,7 +109,8 @@
     writeUrlParams();
     initializeForSelectedStation();
     setPageTitleForStations();
-    showTrainPicker = false;
+    isShowingTrainPicker = false;
+    isShowingNearby = false;
   }
 
   function setPageTitleForStations() {
@@ -142,6 +145,7 @@
   }
 
   function getNearby() {
+    isLoadingNearby = true;
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const response = await fetch(`${baseUrl}/api/stations`);
@@ -149,7 +153,7 @@
         const { stations: allStations = [] } = json;
         const { latitude, longitude } = position.coords;
         const distanceThreshold = 0.01; // 0.015 is just over a mile of latitude, roughly, less longitude
-        const closeStations = [];
+        nearbyStations = [];
         allStations.forEach((station) => {
           const distance = calculateDistance(
             latitude,
@@ -158,21 +162,27 @@
             station.gtfsLongitude
           );
           if (distance < distanceThreshold) {
-            closeStations.push({ ...station, distance: distance });
+            nearbyStations.push({ ...station, distance: distance });
           }
         });
-        closeStations.sort((a, b) => a.distance - b.distance);
+        nearbyStations.sort((a, b) => a.distance - b.distance);
         console.log(
-          closeStations.map((s) => ({
+          nearbyStations.map((s) => ({
             name: s.stopName,
             trains: s.trains,
             id: s.gtfsStopId,
             distande: s.distance,
           }))
         );
+
+        isLoadingNearby = false;
+        if (nearbyStations.length) {
+          isShowingNearby = true;
+        }
       },
       () => {
         console.log("can't get location");
+        isLoadingNearby = false;
       }
     );
   }
@@ -186,17 +196,19 @@
       <StationTitle
         station={selectedStation}
         on:pickNewStation={() => {
-          showTrainPicker = true;
+          isShowingTrainPicker = true;
         }}
       />
     </span>
     <span>
       <button
         on:click={() => {
-          showTrainPicker = !showTrainPicker;
+          isShowingTrainPicker = !isShowingTrainPicker;
         }}>change</button
       >
-      <button on:click={getNearby}>nearby</button>
+      <button on:click={getNearby}
+        >{isLoadingNearby ? "loading..." : "nearby"}</button
+      >
     </span>
   </div>
   <div class="footer">
@@ -205,7 +217,16 @@
       accurate
     </p>
   </div>
-  {#if showTrainPicker}
+  {#if isLoadingNearby}
+    <p>Loading nearby...</p>
+  {:else if isShowingNearby}
+    <div class="nearby-station-picker">
+      <StationList
+        stations={nearbyStations}
+        on:select={handlePickStationEvent}
+      />
+    </div>
+  {:else if isShowingTrainPicker}
     <div class="train-station-picker">
       <TrainPicker on:select={handlePickTrainEvent} />
       {#if stations.length}
@@ -251,6 +272,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .nearby-station-picker {
+    width: min(60ch, 100%);
+    margin: auto;
   }
 
   button {
