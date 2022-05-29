@@ -241,9 +241,8 @@
   <div class="footer">
     <p class="disclaimer">
       Due to lag time in the MTA real-time feeds, information may not be
-      accurate.
-      <br />
-      Location data is never sent to the server.
+      accurate. Location data is checked only when you request and is never sent
+      to the server.
     </p>
   </div>
   {#if nearbyState === NEARBY_STATES.LOADING}
