@@ -1,10 +1,11 @@
 <script lang="ts">
   import TrainPicker from "./components/TrainPicker.svelte";
-  import Stations from "./components/Stations.svelte";
+  import Stations from "./components/StationPicker.svelte";
   import Arrivals from "./components/Arrivals.svelte";
   import StationTitle from "./components/StationTitle.svelte";
   import { onMount } from "svelte";
   import { calculateDistance } from "./helpers/utils";
+  import StationPicker from "./components/StationPicker.svelte";
 
   let selectedTrain = "";
   let selectedStation = {};
@@ -208,7 +209,7 @@
     <div class="train-station-picker">
       <TrainPicker on:select={handlePickTrainEvent} />
       {#if stations.length}
-        <Stations
+        <StationPicker
           {stations}
           train={selectedTrain}
           on:select={handlePickStationEvent}
