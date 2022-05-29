@@ -17,12 +17,8 @@
   }
 
   function toggleDebug() {
-    console.log("Toggle Debug");
     debug = !debug;
   }
-
-  console.log("Arrival", arrival);
-  console.log("Station", station);
 
   let defaultStationLabel =
     arrival.direction === "N"

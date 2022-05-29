@@ -32,7 +32,6 @@
     );
     const arrivalMs = arrival.timestamp * 1000 - Date.now();
 
-    console.log("arrivalMs", arrivalMs);
     const keep =
       arrivalMs > options.soonestTrainArrival &&
       arrivalMs < options.latestTrainArrival &&
@@ -43,7 +42,6 @@
   // Map {train, direction} ==> Arrival[]
   $: arrivalsByTrainDirections = new Map(
     trainDirections.map((trainDirection) => {
-      console.log("trainDirection", trainDirection);
       return [
         trainDirection,
         filteredArrivals
@@ -58,16 +56,6 @@
     })
   );
 
-  $: console.log("arrivals", arrivals);
-  $: console.log("filtered", filteredArrivals);
-  $: console.log("ABTD", arrivalsByTrainDirections);
-  // $: arrivalsByTrain = [...trainDirections].map((trainDirection) => {
-  //   return arrivals.filter((arrival) => arrival.train === train);
-  // });
-  // $: arrivalsByTrainByDirection = arrivalsByTrain.map((arrivalList) => {
-  //   return arrivalList
-  // })
-  // $: relevantArrivals = arrivals
   $: relevantArrivals = [...arrivalsByTrainDirections.values()]
     .flat()
     .filter((arrival) => stationHasDirection(arrival.direction))

@@ -3,21 +3,29 @@
   import Arrivals from "./components/Arrivals.svelte";
   import StationTitle from "./components/StationTitle.svelte";
   import { onMount } from "svelte";
-  import { calculateDistance } from "./helpers/utils";
+  import { calculateDistanceMiles } from "./helpers/utils";
   import StationPicker from "./components/StationPicker.svelte";
   import StationList from "./components/StationList.svelte";
+
+  const NEARBY_STATES = {
+    IDLE: 1,
+    LOADING: 2,
+    LOADED: 3,
+    BLOCKED: 4,
+  };
 
   let selectedTrain = "";
   let selectedStation = {};
   let stations = [];
   let arrivals = [];
   let isShowingTrainPicker = false;
-  let isShowingNearby = false;
-  let isLoadingNearby = false;
   let nearbyStations = [];
+  let nearbyState = NEARBY_STATES.IDLE;
 
   let identifier;
   let intervalId;
+
+  $: nearbyButtonText = getNearbyButtonText(nearbyState);
 
   const baseUrl = __IS_DEVELOPMENT__
     ? "http://localhost:3000"
@@ -109,8 +117,11 @@
     writeUrlParams();
     initializeForSelectedStation();
     setPageTitleForStations();
+    if (!selectedTrain) {
+      setIconToTrain(selectedStation.trains[0]);
+    }
     isShowingTrainPicker = false;
-    isShowingNearby = false;
+    nearbyState = NEARBY_STATES.IDLE;
   }
 
   function setPageTitleForStations() {
@@ -129,13 +140,11 @@
   }
 
   async function initializeForSelectedStation() {
-    console.log("initializing");
     await updateArrivalTimes();
     setUpdateEvery(30000);
   }
 
   async function updateArrivalTimes() {
-    console.log("fetching arrival times for", selectedStation);
     await getArrivalsForStation(selectedStation);
   }
 
@@ -145,46 +154,60 @@
   }
 
   function getNearby() {
-    isLoadingNearby = true;
+    nearbyState = NEARBY_STATES.LOADING;
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const response = await fetch(`${baseUrl}/api/stations`);
         const json = await response.json();
         const { stations: allStations = [] } = json;
+
         const { latitude, longitude } = position.coords;
-        const distanceThreshold = 0.01; // 0.015 is just over a mile of latitude, roughly, less longitude
+        const distanceThresholdMiles = 0.7;
+
         nearbyStations = [];
         allStations.forEach((station) => {
-          const distance = calculateDistance(
+          const distance = calculateDistanceMiles(
             latitude,
             longitude,
             station.gtfsLatitude,
             station.gtfsLongitude
           );
-          if (distance < distanceThreshold) {
-            nearbyStations.push({ ...station, distance: distance });
+          if (distance < distanceThresholdMiles) {
+            nearbyStations.push({
+              ...station,
+              distance: distance,
+              distanceDisplay: `${distance.toFixed(2)}mi`,
+            });
           }
         });
         nearbyStations.sort((a, b) => a.distance - b.distance);
-        console.log(
-          nearbyStations.map((s) => ({
-            name: s.stopName,
-            trains: s.trains,
-            id: s.gtfsStopId,
-            distande: s.distance,
-          }))
-        );
 
-        isLoadingNearby = false;
         if (nearbyStations.length) {
-          isShowingNearby = true;
+          nearbyState = NEARBY_STATES.LOADED;
+        } else {
+          nearbyState = NEARBY_STATES.IDLE;
         }
       },
       () => {
         console.log("can't get location");
-        isLoadingNearby = false;
+        nearbyState = NEARBY_STATES.BLOCKED;
       }
     );
+  }
+
+  function getNearbyButtonText(state) {
+    switch (state) {
+      case NEARBY_STATES.BLOCKED:
+        return "gps blocked";
+
+      case NEARBY_STATES.LOADING:
+        return "loading...";
+
+      case NEARBY_STATES.IDLE:
+      case NEARBY_STATES.LOADED:
+      default:
+        return "nearby";
+    }
   }
 </script>
 
@@ -206,9 +229,7 @@
           isShowingTrainPicker = !isShowingTrainPicker;
         }}>change</button
       >
-      <button on:click={getNearby}
-        >{isLoadingNearby ? "loading..." : "nearby"}</button
-      >
+      <button on:click={getNearby}>{nearbyButtonText}</button>
     </span>
   </div>
   <div class="footer">
@@ -217,13 +238,15 @@
       accurate
     </p>
   </div>
-  {#if isLoadingNearby}
+  {#if nearbyState === NEARBY_STATES.LOADING}
     <p>Loading nearby...</p>
-  {:else if isShowingNearby}
+  {:else if nearbyState === NEARBY_STATES.LOADED}
     <div class="nearby-station-picker">
+      <h2>Nearby Stations</h2>
       <StationList
         stations={nearbyStations}
         on:select={handlePickStationEvent}
+        detailFields={["distanceDisplay"]}
       />
     </div>
   {:else if isShowingTrainPicker}

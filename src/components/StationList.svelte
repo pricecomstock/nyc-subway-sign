@@ -5,6 +5,7 @@
   const dispatch = createEventDispatcher();
 
   export let stations = [];
+  export let detailFields = [];
 
   function selectStation(station) {
     dispatch("select", {
@@ -24,6 +25,11 @@
       <div class="station-name">
         <p>{station.stopName}</p>
       </div>
+      {#each detailFields as detailField}
+        <div class="detail">
+          <p>{station[detailField] ?? ""}</p>
+        </div>
+      {/each}
     </div>
   {/each}
 </div>
@@ -82,9 +88,21 @@
   .station-name {
     display: inline-block;
     overflow-wrap: break-word;
+    flex-grow: 1;
   }
 
   .station-name > p {
+    margin: 0;
+    padding: 0;
+  }
+  .detail {
+    display: inline-block;
+    overflow-wrap: break-word;
+    flex: 0 1;
+    padding: 0 0.5rem;
+  }
+
+  .detail > p {
     margin: 0;
     padding: 0;
   }
@@ -94,7 +112,6 @@
 
   .station-button:hover {
     background: #fafafa;
-    /* color: var(--selected-train-color); */
     border-right: 5px solid var(--selected-train-color);
     font-weight: bold;
     text-decoration-style: wavy;
