@@ -155,8 +155,13 @@
 
   function getNearby() {
     nearbyState = NEARBY_STATES.LOADING;
+    isShowingTrainPicker = false;
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        // if user has switched to manual, don't override
+        if (nearbyState !== NEARBY_STATES.LOADING) {
+          return;
+        }
         const response = await fetch(`${baseUrl}/api/stations`);
         const json = await response.json();
         const { stations: allStations = [] } = json;
@@ -227,6 +232,7 @@
       <button
         on:click={() => {
           isShowingTrainPicker = !isShowingTrainPicker;
+          nearbyState = NEARBY_STATES.IDLE;
         }}>change</button
       >
       <button on:click={getNearby}>{nearbyButtonText}</button>
@@ -235,7 +241,9 @@
   <div class="footer">
     <p class="disclaimer">
       Due to lag time in the MTA real-time feeds, information may not be
-      accurate
+      accurate.
+      <br />
+      Location data is never sent to the server.
     </p>
   </div>
   {#if nearbyState === NEARBY_STATES.LOADING}
