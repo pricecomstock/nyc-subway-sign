@@ -32,8 +32,8 @@
     : parent.location.origin;
 
   onMount(async () => {
-    await loadFromUrlParams();
     identifier = await getIdentifier();
+    await loadFromUrlParams();
   });
 
   function writeUrlParams() {
